@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영양소 검출 실험실 · 24홈판 탐구</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;
+  -webkit-user-select:none;-moz-user-select:none;user-select:none}
+html,body{width:100%;height:100%;background:#e7ecf3;overflow:hidden;
+  touch-action:manipulation;overscroll-behavior:none;
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased}
+#wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1231px;height:769px;transform-origin:center center;position:relative;
+  background:linear-gradient(168deg,#ffffff 0%,#f5f8fc 52%,#eaf0f7 100%);
+  color:#16202f;display:flex;flex-direction:column;padding:14px 18px 10px;gap:10px}
+
+header{display:flex;align-items:center;gap:18px;height:58px;flex:0 0 auto}
+.brand{display:flex;align-items:baseline;gap:11px}
+.brand h1{font-size:29px;font-weight:800;letter-spacing:-.6px;color:#111c2c}
+.brand span{font-size:15px;color:#7c8aa0;font-weight:600}
+.steps{display:flex;gap:6px;margin-left:auto}
+.chip{padding:9px 15px;border-radius:999px;font-size:15px;font-weight:700;letter-spacing:-.3px;
+  background:#f3f6fb;border:1px solid #e3e9f2;color:#8493aa;display:flex;align-items:center;gap:7px;transition:.25s}
+.chip b{font-size:13px;opacity:.65}
+.chip.done{color:#12885c;border-color:#bfe9d6;background:#e9f8f1}
+.chip.on{color:#fff;background:linear-gradient(135deg,#4c94ff,#2f6fe0);border-color:transparent;
+  box-shadow:0 4px 14px rgba(47,111,224,.30)}
+
+main{flex:1;display:flex;gap:14px;min-height:0}
+.panel{background:#fff;border:1px solid #e3e9f2;border-radius:18px;
+  box-shadow:0 1px 2px rgba(20,40,80,.04),0 10px 26px rgba(20,40,80,.05)}
+#left{width:19%;min-width:236px;max-width:308px;flex:0 0 auto;padding:13px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;overflow-x:hidden}
+#center{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative}
+#right{width:25.5%;min-width:318px;max-width:404px;flex:0 0 auto;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;overflow-x:hidden}
+#left::-webkit-scrollbar,#right::-webkit-scrollbar,.view::-webkit-scrollbar{width:7px}
+#left::-webkit-scrollbar-thumb,#right::-webkit-scrollbar-thumb,.view::-webkit-scrollbar-thumb{background:#d5dfec;border-radius:4px}
+.ttl{font-size:13.5px;font-weight:800;letter-spacing:.4px;color:#8493aa}
+.note{font-size:12.5px;font-weight:600;color:#9aa8bd;margin-top:2px}
+
+.shelf{display:flex;flex-direction:column;gap:5px}
+#left>div{flex:0 0 auto}
+.btl{display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:12px;cursor:pointer;
+  background:#f8fafd;border:1px solid #e6ecf5;transition:.16s;position:relative}
+.btl:hover{background:#eff4fc;transform:translateX(3px)}
+.btl.sel{border-color:#2f6fe0;background:#e9f2ff;box-shadow:0 0 0 2px rgba(47,111,224,.30) inset}
+.btl.used{opacity:.42}
+.btl.used:hover{transform:none}
+.btl .cap{width:15px;height:24px;border-radius:4px 4px 2px 2px;flex:0 0 15px;position:relative;
+  box-shadow:inset 0 -9px 11px -6px rgba(0,0,0,.35),0 0 0 1px rgba(30,50,90,.10)}
+.btl .cap::before{content:'';position:absolute;left:2px;right:2px;top:-4px;height:5px;border-radius:2px;background:#adbcd0}
+.btl .nm{font-size:16px;font-weight:700;line-height:1.3;letter-spacing:-.4px;color:#16202f}
+.btl .tick{margin-left:auto;font-size:15px;color:#12885c;font-weight:800}
+
+.hand{margin-top:auto;padding:10px 12px;border-radius:13px;background:#eef5ff;
+  border:1px dashed #bcd5f7;font-size:13.5px;line-height:1.45;color:#42618d;font-weight:600}
+.hand b{color:#11396f}
+
+.stagebar{height:54px;flex:0 0 54px;display:flex;align-items:center;gap:13px;padding:0 18px;min-width:0}
+.stagebar .no{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#4c94ff,#2f6fe0);
+  color:#fff;font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center}
+.stagebar .tx{font-size:19px;font-weight:800;letter-spacing:-.5px;color:#16202f;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stagebar .tx em{font-style:normal;color:#8493aa;font-weight:600;margin-left:10px;font-size:15.5px}
+.prog{margin-left:auto;flex:0 0 auto;white-space:nowrap;font-size:15px;font-weight:800;color:#2f6fe0;background:#eaf2ff;
+  border:1px solid #cfe1fb;padding:6px 15px;border-radius:999px;display:none}
+.prog.on{display:block}
+.canvasbox{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:manipulation;-webkit-user-drag:none}
+::selection{background:transparent}
+.view{position:absolute;inset:0;padding:12px 26px 16px;overflow:auto;display:none;flex-direction:column;gap:13px}
+.view.on{display:flex}
+.canvasbox.hide canvas{visibility:hidden}
+
+.gear{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gcard{border-radius:18px;padding:20px 12px;text-align:center;cursor:pointer;transition:.18s;
+  background:#f8fafd;border:1px solid #e6ecf5}
+.gcard:hover{background:#eff4fc}
+.gcard.on{background:#eafaf2;border-color:#a8e3c9}
+.gcard svg{width:72px;height:72px;margin-bottom:10px}
+.gcard .gn{font-size:18px;font-weight:800;color:#16202f}
+.gcard .gd{font-size:14px;color:#8493aa;margin-top:6px;line-height:1.45;font-weight:600}
+.warnbox{border-radius:14px;padding:15px 18px;background:#fff8ee;border:1px solid #f2dcb8;
+  font-size:15.5px;line-height:1.75;color:#8a5f22;font-weight:600}
+.warnbox b{color:#6b4611}
+.warnbox.info{background:#eef5ff;border-color:#cfe1fb;color:#42618d}
+.warnbox.info b{color:#11396f}
+
+.ptable{width:100%;border-collapse:separate;border-spacing:0 8px}
+.ptable td{vertical-align:middle}
+.pfood{font-size:19px;font-weight:800;width:135px;padding-left:6px;color:#16202f}
+.nchips{display:flex;gap:10px}
+.nchip{padding:10px 22px;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;transition:.14s;
+  background:#f4f7fb;border:1.5px solid #e2e8f2;color:#66768e;user-select:none}
+.nchip:hover{background:#e9eff7}
+.nchip.on{background:#e4efff;border-color:#2f6fe0;color:#1c4f9e}
+.nchip.fixed{background:#e9f8f1;border-color:#a8e3c9;color:#12885c;cursor:default}
+.nchip.right{background:#e9f8f1;border-color:#37b483;color:#12885c}
+.nchip.wrong{background:#ffefee;border-color:#f0a5a0;color:#b23a3a;text-decoration:line-through}
+.nchip.miss{border-style:dashed;border-color:#e0a24a;color:#a86a17}
+
+.rtable{width:100%;border-collapse:collapse;font-size:16px}
+.rtable th,.rtable td{border:1px solid #dde5ef;padding:9px 4px;text-align:center;font-weight:700;color:#5c6d87}
+.rtable th{background:#f1f5fa;color:#46586f;font-size:15px}
+.rtable td.rl{background:#f7f9fc;color:#2b3a51;font-size:15px;width:186px;text-align:left;padding-left:12px}
+
+.guide{border-radius:13px;padding:11px 13px;background:#eef5ff;border:1px solid #cfe1fb;flex:0 0 auto}
+.guide h3{font-size:15px;font-weight:800;margin-bottom:5px;color:#11396f}
+.guide p{font-size:13.5px;line-height:1.55;color:#42618d;font-weight:600}
+.guide p+p{margin-top:4px}
+.guide b{color:#11396f}
+
+.live{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.live th,.live td{border:1px solid #dfe6f0;padding:7px 2px;text-align:center;font-weight:700;
+  line-height:1.3;word-break:keep-all;color:#46586f}
+.live th{background:#f1f5fa;color:#46586f;font-size:12.5px}
+.live td.rl{background:#f7f9fc;color:#34455e;font-size:12px;width:76px;word-break:keep-all;line-height:1.3}
+.live td.e{color:#b6c0cf}
+.rescols{display:grid;grid-template-columns:1fr 430px;gap:26px;align-items:start}
+.key{width:100%;border-collapse:collapse;font-size:14.5px;table-layout:fixed}
+.key th,.key td{border:1px solid #dfe6f0;padding:9px 5px;text-align:center;font-weight:700;line-height:1.35;color:#46586f}
+.key th{background:#f1f5fa;color:#46586f;font-size:13.5px}
+.key td:first-child{color:#16202f;font-weight:800;font-size:15.5px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 3px;vertical-align:-1px;
+  box-shadow:0 0 0 1px rgba(20,40,80,.18)}
+
+footer{height:50px;flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:0 6px}
+.keys{font-size:13.5px;color:#8b9ab1;font-weight:600;letter-spacing:-.2px}
+.keys kbd{background:#f0f4fa;border:1px solid #dfe6f0;border-radius:6px;padding:3px 7px;font-size:12.5px;
+  font-family:inherit;font-weight:700;color:#5c6d87;margin:0 3px}
+.btns{margin-left:auto;display:flex;gap:9px}
+.bt{padding:11px 26px;border-radius:12px;font-size:16.5px;font-weight:800;cursor:pointer;
+  border:1px solid #e0e7f1;background:#f2f6fb;color:#3d4f68;transition:.15s;letter-spacing:-.3px}
+.bt:hover{background:#e6edf7}
+.zoomctl{display:flex;align-items:center;gap:2px;background:#f2f6fb;border:1px solid #e0e7f1;border-radius:12px;padding:3px}
+.zbt{width:33px;height:33px;border:0;background:transparent;border-radius:9px;font-size:19px;font-weight:800;
+  color:#3d4f68;cursor:pointer;line-height:1;transition:.14s}
+.zbt:hover{background:#e2eaf5}
+.zbt:disabled{opacity:.28;cursor:not-allowed;background:transparent}
+#zVal{min-width:58px;text-align:center;font-size:15px;font-weight:800;color:#2f6fe0}
+.bt.icon{display:flex;align-items:center;gap:8px;padding:11px 18px}
+.bt.icon svg{width:19px;height:19px;flex:0 0 19px}
+.bt.pri{background:linear-gradient(135deg,#4c94ff,#2f6fe0);color:#fff;border-color:transparent;
+  box-shadow:0 5px 16px rgba(47,111,224,.28)}
+.bt.pri:hover{filter:brightness(1.06)}
+.bt.warm{background:linear-gradient(135deg,#ffa640,#f4741f);color:#fff;border-color:transparent;
+  box-shadow:0 5px 16px rgba(244,116,31,.28)}
+.bt:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;filter:none}
+
+#toast{position:absolute;left:50%;bottom:80px;transform:translate(-50%,14px);opacity:0;pointer-events:none;
+  background:#16202f;color:#fff;border:1px solid rgba(255,255,255,.12);padding:13px 26px;border-radius:13px;
+  font-size:17px;font-weight:700;transition:.25s;z-index:60;box-shadow:0 10px 32px rgba(20,40,80,.28)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* 배율이 높아 무대가 좁아졌을 때의 밀도 조정 */
+#stage.narrow .brand span{display:none}
+#stage.narrow .brand h1{font-size:25px}
+#stage.narrow .chip{font-size:13px;padding:7px 11px;gap:5px}
+#stage.narrow .chip b{font-size:11px}
+#stage.narrow .stagebar{height:46px;flex:0 0 46px;padding:0 14px}
+#stage.narrow .stagebar .tx{font-size:17px}
+#stage.narrow .stagebar .tx em{font-size:14px}
+#stage.narrow .prog{font-size:13.5px;padding:5px 12px}
+#stage.narrow #left{gap:5px}
+#stage.narrow .note{margin-bottom:4px !important}
+#stage.narrow .shelf{gap:5px}
+#stage.narrow .ttl{font-size:12.5px}
+#stage.narrow .note{font-size:11px}
+#stage.narrow .btl{padding:4px 10px;gap:9px}
+#stage.narrow .btl .nm{font-size:15px}
+#stage.narrow .btl .cap{width:16px;height:28px;flex:0 0 16px}
+#stage.narrow .hand{font-size:12.5px;padding:8px 10px;line-height:1.45}
+#stage.narrow .guide{padding:12px 13px}
+#stage.narrow .guide h3{font-size:15px}
+#stage.narrow .guide{padding:11px 12px}
+#stage.narrow .guide p{font-size:13px;line-height:1.5}
+#stage.narrow #right{gap:8px}
+#stage.narrow .live{font-size:11.5px}
+#stage.narrow .live th{font-size:10px}
+#stage.narrow .live th,#stage.narrow .live td{padding:5px 1px}
+#stage.narrow .live td.rl{font-size:10px;width:54px}
+#stage.narrow .key{font-size:11.5px}
+#stage.narrow .key th{font-size:10.5px}
+#stage.narrow .key th,#stage.narrow .key td{padding:4px 2px}
+#stage.narrow .key td:first-child{font-size:12.5px}
+#stage.narrow .view{gap:10px;padding:10px 20px 14px}
+#stage.narrow .rtable{font-size:13px}
+#stage.narrow .rtable th{font-size:12.5px}
+#stage.narrow .rtable th,#stage.narrow .rtable td{padding:6px 3px;white-space:nowrap}
+#stage.narrow .rtable td.rl{font-size:12.5px;width:150px;white-space:normal}
+#stage.narrow .ptable{border-spacing:0 5px}
+#stage.narrow .nchip{font-size:14.5px;padding:6px 15px}
+#stage.narrow .pfood{font-size:16px;width:104px}
+#stage.narrow .warnbox{font-size:13.5px;padding:11px 13px;line-height:1.65}
+#stage.narrow .gear{gap:10px}
+#stage.narrow .gcard{padding:16px 10px}
+#stage.narrow .gcard svg{width:60px;height:60px}
+#stage.narrow .gcard .gn{font-size:16px}
+#stage.narrow .gcard .gd{font-size:12.5px}
+#stage.narrow .keys{font-size:12px}
+#stage.narrow .keys kbd{padding:2px 5px;font-size:11px;margin:0 2px}
+#stage.narrow .bt{font-size:15px;padding:10px 17px}
+#stage.narrow .bt.icon{padding:10px 14px}
+#stage.narrow .zbt{width:29px;height:29px;font-size:17px}
+#stage.narrow #zVal{min-width:50px;font-size:13.5px}
+#stage.xnarrow #left{gap:4px}
+#stage.xnarrow .ttl{font-size:11.5px}
+#stage.xnarrow .note{font-size:10px;margin-bottom:3px !important}
+#stage.xnarrow .btl{padding:2px 9px}
+#stage.xnarrow .btl .nm{font-size:14px}
+#stage.xnarrow .shelf{gap:3px}
+#stage.xnarrow .hand{font-size:11.5px;padding:6px 9px;line-height:1.4}
+#stage.xnarrow .guide p{font-size:12px;line-height:1.45}
+#stage.xnarrow .guide h3{font-size:14px}
+#stage.xnarrow .live,#stage.xnarrow .key{font-size:10.5px}
+#stage.xnarrow .live th,#stage.xnarrow .live td,#stage.xnarrow .key th,#stage.xnarrow .key td{padding:3px 1px}
+#stage.xnarrow .brand h1{font-size:22px}
+#stage.xnarrow .chip{font-size:11.5px;padding:6px 9px}
+#stage.xnarrow .keys{display:none}
+#lock{position:absolute;inset:0;background:rgba(226,233,243,.86);backdrop-filter:blur(6px);z-index:90;
+  display:none;align-items:center;justify-content:center}
+#lock.on{display:flex}
+.lockbox{width:360px;background:#fff;border:1px solid #e3e9f2;border-radius:22px;padding:26px 28px 22px;
+  text-align:center;box-shadow:0 24px 60px rgba(20,40,80,.2)}
+.lkicon{color:#2f6fe0;margin-bottom:6px}
+.lkicon svg{width:40px;height:40px}
+.lockbox h2{font-size:21px;font-weight:800;color:#111c2c}
+.lksub{font-size:13.5px;color:#7c8aa0;font-weight:600;margin-top:5px}
+.dots{display:flex;gap:14px;justify-content:center;margin:18px 0 14px}
+.dots i{width:15px;height:15px;border-radius:50%;background:#e3e9f2;transition:.15s}
+.dots i.on{background:#2f6fe0;transform:scale(1.12)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pad button{height:52px;border-radius:13px;border:1px solid #e0e7f1;background:#f5f8fc;color:#25334a;
+  font-family:inherit;font-size:21px;font-weight:800;cursor:pointer;transition:.12s}
+.pad button:hover{background:#e9eff8}
+.pad button:active{transform:scale(.95)}
+.pad button.sm{font-size:14px;color:#7c8aa0}
+.lkmsg{font-size:13.5px;font-weight:700;color:#d0453f;margin-top:12px;min-height:19px}
+.shake{animation:sh .38s}
+@keyframes sh{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+#tip{position:absolute;inset:0;background:rgba(226,233,243,.84);backdrop-filter:blur(6px);z-index:80;
+  display:none;align-items:center;justify-content:center;padding:40px}
+#tip.on{display:flex}
+.tipbox{width:1200px;max-height:800px;overflow:auto;background:#fff;border:1px solid #e3e9f2;
+  border-radius:22px;padding:30px 36px;box-shadow:0 24px 60px rgba(20,40,80,.18)}
+.tipbox h2{font-size:24px;font-weight:800;margin-bottom:5px;color:#111c2c}
+.tipbox .sm{font-size:14.5px;color:#8493aa;font-weight:600;margin-bottom:20px}
+.tipgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.tipsec h4{font-size:16px;font-weight:800;color:#2f6fe0;margin-bottom:9px}
+.tipsec li{font-size:15px;line-height:1.65;color:#4a5b74;margin-left:18px;margin-bottom:7px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="pad"><div id="stage">
+
+<header>
+  <div class="brand"><h1>영양소 검출 실험실</h1><span>중2 과학 · Ⅵ. 동물과 에너지 — 24홈판 탐구</span></div>
+  <div class="steps" id="steps"></div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <aside class="panel" id="left">
+    <div>
+      <div class="ttl">음식물 희석액</div>
+      <div class="note" style="margin-bottom:6px">10 g / 물 90 mL · 홈마다 2 mL</div>
+      <div class="shelf" id="foodShelf"></div>
+    </div>
+    <div>
+      <div class="ttl" style="margin-top:4px">검출 시약</div>
+      <div class="note" style="margin-bottom:6px">홈마다 2~3 방울</div>
+      <div class="shelf" id="reagShelf"></div>
+    </div>
+    <div class="hand" id="hand">스포이트가 비어 있습니다.<br>왼쪽에서 넣을 것을 먼저 고르세요.</div>
+  </aside>
+
+  <!-- CENTER -->
+  <section class="panel" id="center">
+    <div class="stagebar"><div class="no" id="stNo">1</div><div class="tx" id="stTx"></div>
+      <div class="prog" id="stProg"></div></div>
+    <div class="canvasbox" id="cbox">
+      <canvas id="cv" width="840" height="570"></canvas>
+
+      <!-- safety view -->
+      <div class="view" id="vSafety">
+        <div class="gear" id="gear"></div>
+        <div class="warnbox">
+          <b>실험 전 확인</b> · 뜨거운 물을 다룰 때는 내열 장갑을 낀다 · 검출 용액이 피부에 묻으면 즉시 흐르는 물에 씻는다 ·
+          베네딕트 반응은 시험관을 직접 가열하지 않고 <b>중탕</b>한다 · 사용한 용액은 정해진 폐수 통에 버린다.
+        </div>
+      </div>
+
+      <!-- predict view -->
+      <div class="view" id="vPredict">
+        <div class="warnbox info">
+          떡에 가장 많이 들어 있는 영양소는 <b>녹말</b>입니다.
+          나머지 음식물에는 어떤 영양소가 들어 있을지 <b>예상</b>해 보세요. 근거를 함께 이야기해 봅니다.
+        </div>
+        <table class="ptable" id="ptbl"></table>
+      </div>
+
+      <!-- result view -->
+      <div class="view" id="vResult">
+        <table class="rtable" id="rtbl"></table>
+        <div class="rescols">
+          <div>
+            <div class="ttl" style="margin-bottom:4px">색 변화를 근거로, 각 음식물에 들어 있는 영양소를 정리해 보세요</div>
+            <table class="ptable" id="jtbl"></table>
+            <div class="warnbox" id="jmsg" style="display:none"></div>
+          </div>
+          <div>
+            <div class="ttl" style="margin-bottom:8px">핵심 정리</div>
+            <table class="key" id="keyTbl"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="keys"><kbd>클릭</kbd> 홈에 떨어뜨리기 <kbd>←</kbd><kbd>→</kbd> 단계 <kbd>−</kbd><kbd>+</kbd> 배율 <kbd>F</kbd> 전체화면 <kbd>T</kbd> 지도 팁 <kbd>R</kbd> 처음부터</div>
+  <div class="btns">
+    <div class="zoomctl" title="화면 배율 ( - / + )">
+      <button class="zbt" id="zOut">−</button><span id="zVal">130%</span><button class="zbt" id="zIn">+</button>
+    </div>
+    <button class="bt icon" id="btnFull" title="전체화면 (F)"><svg id="fsIcon" viewBox="0 0 24 24"></svg><span id="fsTx">전체화면</span></button>
+    <button class="bt" id="btnPrev">이전</button>
+    <button class="bt pri" id="btnNext">다음</button>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<div id="lock"><div class="lockbox">
+  <div class="lkicon"><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="10" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="15.5" r="1.6" fill="currentColor"/></svg></div>
+  <h2>결과 정리 잠금</h2>
+  <p class="lksub">선생님이 알려 주는 숫자 4자리를 입력하세요.</p>
+  <div class="dots" id="lkDots"></div>
+  <div class="pad" id="lkPad"></div>
+  <div class="lkmsg" id="lkMsg">&nbsp;</div>
+</div></div>
+
+<div id="tip"><div class="tipbox">
+  <h2>교사용 지도 팁</h2><div class="sm">천재교과서 중등 과학2 · 206~207쪽 탐구 지도 자료</div>
+  <div class="tipgrid">
+    <div class="tipsec"><h4>지도상의 유의점</h4><ul>
+      <li>음식물은 반드시 희석하여 사용한다. 희석하면 음식물 자체 색이 옅어져 색 변화를 뚜렷하게 볼 수 있다.</li>
+      <li>검출 용액이 피부에 묻지 않게 하고, 묻었을 때는 즉시 흐르는 물에 씻도록 지도한다.</li>
+      <li>베네딕트 반응은 직접 가열하지 않고 중탕한다. 내열 장갑을 착용해 화상을 예방한다.</li>
+      <li>떡·어묵 등 고체는 10 g을 잘게 으깬 뒤 물 90 mL에 섞고 거름종이로 걸러 사용한다.</li>
+    </ul></div>
+    <div class="tipsec"><h4>탐구 활동 유의점</h4><ul>
+      <li>예상 활동에서 어떤 근거로 그렇게 예상했는지 토의한 후 쓰도록 한다.</li>
+      <li>중탕 대신 전자레인지로 10초 정도 가열하면 쉽게 결과를 얻을 수 있다.</li>
+      <li>주스에 바이타민 C가 많으면 아이오딘 용액이 반응해 연한 갈색 → 무색이 된다. 청람색이 아니므로 녹말 반응이 아님을 안내한다.</li>
+      <li>음식물의 영양소는 한 가지 또는 여러 가지일 수 있고, 양에 따라 색깔 차이가 날 수 있다.</li>
+      <li>생선 함량이 낮은 어묵은 단백질이 검출되지 않을 수 있다. 그 까닭을 생각해 보도록 한다.</li>
+    </ul></div>
+    <div class="tipsec"><h4>검출 시약 제조</h4><ul>
+      <li>뷰렛 용액: 0.01 M 황산 구리(Ⅱ) 25 mL + 10 M 수산화 나트륨 1 L. 중학교에서는 5 % 수산화 나트륨 수용액과 1 % 황산 구리(Ⅱ) 수용액을 각각 사용한다.</li>
+      <li>두 용액을 미리 섞으면 검은색 침전이 생기므로, 섞은 즉시 사용하거나 홈에 각각 넣는 것이 좋다.</li>
+      <li>수단 Ⅲ 용액: 수단 Ⅲ 1 g을 70 % 에탄올 100 mL에 녹여 만든다.</li>
+    </ul></div>
+    <div class="tipsec"><h4>확장 발문</h4><ul>
+      <li>포도당 외에 과당·갈락토스·엿당·젖당도 베네딕트 용액과 반응해 황적색이 된다. 황적색 = 포도당이라고 단정하지 않도록 한다.</li>
+      <li>스마트 기기 앱은 녹말과 포도당을 구분하지 않고 모두 탄수화물로 표시한다. 검출 실험과의 차이점을 토의한다.</li>
+      <li>지방은 용액 전체가 아니라 <b>선홍색 방울</b>로 관찰된다는 점을 짚어 준다.</li>
+    </ul></div>
+  </div>
+  <div style="text-align:center;margin-top:20px"><button class="bt" onclick="document.getElementById('tip').classList.remove('on')">닫기 (T)</button></div>
+</div></div>
+
+</div></div></div>
+
+<script>
+/* ══════════════════════ 데이터 ══════════════════════ */
+const NUT = {starch:'녹말', protein:'단백질', fat:'지방', sugar:'당'};
+// 병·안내에는 '떡 희석액'처럼, 홈판 머리글에는 '떡'처럼 짧게 쓴다
+const foodLabel = f => f.id==='water' ? f.n : f.n+' 희석액';
+
+const FOODS = [
+  {id:'water', n:'증류수', sn:'증류수', sub:'대조군', c:'#dbe9fa', nut:[]},
+  {id:'tteok', n:'떡', sn:'떡',       sub:'10 g / 물 90 mL', c:'#f0e8d3', nut:['starch']},
+  {id:'egg',   n:'달걀흰자', sn:'달걀', sub:'10 g / 물 90 mL', c:'#f6f5ec', nut:['protein']},
+  {id:'eomuk', n:'어묵', sn:'어묵',     sub:'10 g / 물 90 mL', c:'#e7d9b8', nut:['starch','protein','fat','sugar']},
+  {id:'milk',  n:'우유', sn:'우유',     sub:'10 g / 물 90 mL', c:'#fcfcf8', nut:['protein','fat']},
+  {id:'juice', n:'주스', sn:'주스',     sub:'10 g / 물 90 mL', c:'#ffb84d', nut:['sugar']},
+];
+
+const REAG = [
+  {id:'iodine',   n:'아이오딘–아이오딘화 칼륨 용액', s:'아이오딘 용액', lab:['아이오딘–','아이오딘화','칼륨 용액'],
+   sh:'아이오딘 용액', base:'#c9975c', pos:'#25398c', baseTx:'연한 갈색', posTx:'청람색', tgt:'starch', heat:false},
+  {id:'biuret',   n:'뷰렛 용액', s:'뷰렛 용액', lab:['뷰렛 용액'],
+   sh:'뷰렛 용액', base:'#5a8fd8', pos:'#7d3fa6', baseTx:'푸른색', posTx:'보라색', tgt:'protein', heat:false},
+  {id:'sudan',    n:'수단 Ⅲ 용액', s:'70 % 에탄올에 용해', lab:['수단 Ⅲ 용액'],
+   sh:'수단 Ⅲ 용액', base:'#c74a3a', pos:'#ff5f80', baseTx:'붉은색', posTx:'선홍색', tgt:'fat', heat:false},
+  {id:'benedict', n:'베네딕트 용액', s:'중탕 필요 · 80~90 ℃', lab:['베네딕트','용액'],
+   sh:'베네딕트 용액', base:'#4f86d6', pos:'#e2701f', baseTx:'푸른색', posTx:'황적색', tgt:'sugar', heat:true},
+];
+
+const STEPS = ['안전 준비','예상하기','희석액 넣기','시약 넣기','중탕하기','결과 정리'];
+const GEARS = [
+  {id:'coat', n:'실험복', d:'옷과 피부를 보호'},
+  {id:'gog',  n:'보안경', d:'용액 튐 방지'},
+  {id:'glv',  n:'실험용 장갑', d:'검출 용액 접촉 차단'},
+  {id:'heat', n:'내열 장갑', d:'중탕 시 화상 예방'},
+];
+
+/* ══════════════════════ 상태 ══════════════════════ */
+let step = 0;
+let sel = null;                       // {kind:'food'|'reag', id}
+let wells = [];                       // wells[r][c] = {food, reag, heated}
+let gearOn = {}, predict = {}, judge = {};
+let bath = null;                      // {t, total, done}
+let judged = false;
+for (let r=0;r<4;r++){ wells[r]=[]; for(let c=0;c<6;c++) wells[r][c]={food:null,reag:null,heated:false,parts:[],fillT:0,pending:false}; }
+FOODS.slice(1).forEach(f=>{ predict[f.id]=new Set(); judge[f.id]=new Set(); });
+predict['tteok'].add('starch');
+
+/* ══════════════════════ 캔버스 ══════════════════════ */
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const W=840,H=570;
+// 활동지(8~832, 8~562)가 캔버스를 거의 꽉 채우도록 잡은 좌표
+const PLATE={x:136,y:78,w:682,h:466};
+const SHEET={dx:128, dw:142, dy:70, dh:88};    // 활동지가 홈판 밖으로 나가는 여백
+const CR=49, CX0=136+15+CR, CDX=(682-30-CR*2)/5, CY0=78+15+CR, CDY=(466-30-CR*2)/3;
+const cellX=c=>CX0+c*CDX, cellY=r=>CY0+r*CDY;
+let drops=[], splash=[], bubbles=[], hoverR=-1, hoverC=-1, tNow=0;
+
+function hexToRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function toRgb(col){
+  if(typeof col==='string'&&col[0]==='#') return hexToRgb(col);
+  const m=String(col).match(/\d+/g)||[0,0,0];
+  return m.slice(0,3).map(Number);
+}
+function mix(a,b,t){const A=toRgb(a),B=toRgb(b);return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`;}
+function shade(col,t){ // t<0 어둡게, t>0 밝게
+  const m=toRgb(col);
+  return `rgb(${m.map(v=>Math.max(0,Math.min(255,Math.round(t<0?v*(1+t):v+(255-v)*t)))).join(',')})`;
+}
+// 2~3방울은 2 mL 희석액의 색을 거의 바꾸지 못한다. 무색인 증류수만 시약 색을 그대로 띤다.
+const TINT=0.12;
+function noChangeColor(F,R){ return F.id==='water' ? R.base : mix(F.c,R.base,TINT); }
+function wellColor(r,c){
+  const w=wells[r][c]; if(!w.food) return null;
+  const F=FOODS.find(f=>f.id===w.food), R=REAG[r];
+  if(!w.reag) return F.c;                        // 시약 넣기 전 = 희석액 색
+  const reacted = F.nut.includes(R.tgt) && !(R.heat && !w.heated);
+  if(!reacted) return noChangeColor(F,R);        // 변화 없음
+  // 수단 Ⅲ는 용액 전체가 아니라 지방 방울만 선홍색으로 물든다
+  return R.id==='sudan' ? noChangeColor(F,R) : R.pos;
+}
+function isPos(r,c){const w=wells[r][c];if(!w.food||!w.reag)return false;
+  const F=FOODS.find(f=>f.id===w.food);if(REAG[r].heat&&!w.heated)return false;return F.nut.includes(REAG[r].tgt);}
+function resultText(r,c){const w=wells[r][c];if(!w.food||!w.reag)return null;
+  if(REAG[r].heat&&!w.heated)return '가열 전';
+  if(isPos(r,c))return REAG[r].posTx;
+  return c===0?REAG[r].baseTx:'변화 없음';}
+
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function drawPlate(){
+  ctx.clearRect(0,0,W,H);
+  // 활동지
+  ctx.save();
+  ctx.fillStyle='#eff3f9';
+  roundRect(PLATE.x-SHEET.dx,PLATE.y-SHEET.dy,PLATE.w+SHEET.dw,PLATE.h+SHEET.dh,18);ctx.fill();
+  ctx.strokeStyle='#e1e8f2';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.restore();
+
+  // 열 라벨
+  ctx.textAlign='center';
+  for(let c=0;c<6;c++){
+    const on = sel&&sel.kind==='food'&&hoverC===c;
+    ctx.fillStyle = on?'#2f6fe0':(colFilled(c)?'#25334a':'#8b9ab1');
+    const nm=FOODS[c].n, by=PLATE.y-38;
+    if(colFilled(c)){
+      ctx.font='800 21px Pretendard,sans-serif'; const w1=ctx.measureText(nm).width;
+      ctx.font='700 14px Pretendard,sans-serif'; const w2=ctx.measureText(' 2 mL').width;
+      const x0=cellX(c)-(w1+w2)/2, keep=ctx.fillStyle;
+      ctx.textAlign='left';
+      ctx.font='800 21px Pretendard,sans-serif'; ctx.fillStyle=keep; ctx.fillText(nm, x0, by);
+      ctx.font='700 14px Pretendard,sans-serif'; ctx.fillStyle='#12885c'; ctx.fillText(' 2 mL', x0+w1, by);
+      ctx.textAlign='center';
+    } else {
+      ctx.font='800 21px Pretendard,sans-serif'; ctx.fillText(nm, cellX(c), by);
+    }
+  }
+  // 행 라벨
+  ctx.textAlign='right';
+  for(let r=0;r<4;r++){
+    const R=REAG[r], on = sel&&sel.kind==='reag'&&hoverR===r;
+    ctx.fillStyle=on?'#2f6fe0':(rowFilled(r)?'#25334a':'#8b9ab1');
+    ctx.font='800 16px Pretendard,sans-serif';
+    const L=R.lab, y0=cellY(r)-(L.length-1)*11;
+    L.forEach((t,i)=>ctx.fillText(t, PLATE.x-28, y0+i*21+6));
+    ctx.beginPath();ctx.arc(PLATE.x-15,cellY(r),7,0,7);ctx.fillStyle=R.base;ctx.fill();
+    ctx.strokeStyle='rgba(20,40,80,.18)';ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.textAlign='center';
+
+  // 홈판 본체
+  ctx.save();
+  ctx.shadowColor='rgba(30,50,90,.20)';ctx.shadowBlur=24;ctx.shadowOffsetY=9;
+  const g=ctx.createLinearGradient(0,PLATE.y,0,PLATE.y+PLATE.h);
+  g.addColorStop(0,'#f6f9fd');g.addColorStop(1,'#dce4f0');
+  ctx.fillStyle=g;roundRect(PLATE.x,PLATE.y,PLATE.w,PLATE.h,14);ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle='#c9d5e5';ctx.lineWidth=1.4;
+  roundRect(PLATE.x,PLATE.y,PLATE.w,PLATE.h,14);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.2;
+  roundRect(PLATE.x+2.5,PLATE.y+2.5,PLATE.w-5,PLATE.h-5,12);ctx.stroke();
+
+  // 넣을 차례인 줄을 옅게 표시
+  if(sel&&sel.kind==='food'){
+    const c=FOODS.findIndex(f=>f.id===sel.id);
+    if(c>=0&&!colFilled(c)){ctx.fillStyle='rgba(47,111,224,.09)';
+      roundRect(cellX(c)-CR-6,PLATE.y+7,CR*2+12,PLATE.h-14,14);ctx.fill();}
+  }
+  if(sel&&sel.kind==='reag'){
+    const r=REAG.findIndex(x=>x.id===sel.id);
+    if(r>=0&&!rowFilled(r)){ctx.fillStyle='rgba(47,111,224,.09)';
+      roundRect(PLATE.x+7,cellY(r)-CR-6,PLATE.w-14,CR*2+12,14);ctx.fill();}
+  }
+
+  for(let r=0;r<4;r++)for(let c=0;c<6;c++) drawWell(r,c);
+
+  // 아직 넣지 않은 홈에 점선 고리, 마우스가 올라간 홈은 진하게
+  if(sel){
+    const pulse=0.55+0.45*Math.sin(tNow/16);
+    for(let r=0;r<4;r++)for(let c=0;c<6;c++){
+      if(!targetOk(r,c)) continue;
+      const hov=(r===hoverR&&c===hoverC);
+      ctx.beginPath();ctx.arc(cellX(c),cellY(r),CR+6,0,7);
+      ctx.strokeStyle = hov?'#2f6fe0':`rgba(47,111,224,${0.32+0.33*pulse})`;
+      ctx.lineWidth = hov?4.5:3;
+      if(!hov)ctx.setLineDash([9,7]);
+      ctx.stroke();ctx.setLineDash([]);
+    }
+    if(targetOk(hoverR,hoverC)){
+      const col = sel.kind==='food' ? FOODS.find(f=>f.id===sel.id).c : REAG[hoverR].base;
+      const dx=cellX(hoverC), dy=cellY(hoverR)-CR-15+Math.sin(tNow/11)*3;
+      ctx.beginPath();ctx.ellipse(dx,dy,6,8.5,0,0,7);
+      ctx.fillStyle=col;ctx.fill();
+      ctx.strokeStyle='rgba(47,111,224,.75)';ctx.lineWidth=1.6;ctx.stroke();
+      ctx.beginPath();ctx.ellipse(dx-1.8,dy-2.5,1.8,2.4,-0.4,0,7);
+      ctx.fillStyle='rgba(255,255,255,.75)';ctx.fill();
+    }
+  }
+
+  drops.forEach(d=>{
+    if(d.delay>0)return;
+    drawPipette(d.x, d.py, d.color, 0.7);
+    ctx.beginPath();ctx.ellipse(d.x,d.y,5.4,7.4,0,0,7);
+    ctx.fillStyle=d.color;ctx.globalAlpha=.95;ctx.fill();ctx.globalAlpha=1;
+  });
+  splash.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);
+    ctx.fillStyle=s.color;ctx.globalAlpha=s.life;ctx.fill();ctx.globalAlpha=1;});
+}
+
+function drawPipette(x,y,col,k){
+  k=k||1;
+  ctx.save();
+  ctx.shadowColor='rgba(20,45,85,.22)';ctx.shadowBlur=8*k;ctx.shadowOffsetY=2*k;
+  ctx.strokeStyle='rgba(120,142,175,.6)';ctx.lineWidth=1.5*k;
+  ctx.fillStyle='#f4f8fd';
+  roundRect(x-9*k,y-54*k,18*k,40*k,5*k);ctx.fill();ctx.stroke();
+  ctx.shadowColor='transparent';
+  ctx.beginPath();ctx.moveTo(x-7.5*k,y-15*k);ctx.lineTo(x+7.5*k,y-15*k);
+  ctx.lineTo(x+2*k,y+8*k);ctx.lineTo(x-2*k,y+8*k);ctx.closePath();
+  ctx.fillStyle='#e8eff8';ctx.fill();ctx.stroke();
+  ctx.fillStyle=col;ctx.globalAlpha=.85;
+  roundRect(x-5.5*k,y-36*k,11*k,21*k,3.5*k);ctx.fill();ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+function drawWell(r,c){
+  const x=cellX(c), y=cellY(r), w=wells[r][c];
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,CR,0,7);
+  const g=ctx.createRadialGradient(x-9,y-11,3,x,y,CR);
+  g.addColorStop(0,'#ffffff');g.addColorStop(1,'#c4d0e0');
+  ctx.fillStyle=g;ctx.fill();
+  ctx.restore();
+
+  const col=wellColor(r,c);
+  if(col){
+    const fr=Math.min(1,w.fillT);
+    ctx.save();
+    ctx.beginPath();ctx.arc(x,y,CR-4,0,7);ctx.clip();
+    const lg=ctx.createRadialGradient(x-8,y-10,2,x,y,CR);
+    lg.addColorStop(0,shade(col,.24));lg.addColorStop(.75,col);lg.addColorStop(1,shade(col,-.28));
+    ctx.globalAlpha=.5+.5*fr;
+    ctx.beginPath();ctx.arc(x,y,(CR-4)*(0.55+0.45*fr),0,7);ctx.fillStyle=lg;ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.beginPath();ctx.ellipse(x-12,y-15,13,7,-0.5,0,7);
+    ctx.fillStyle='rgba(255,255,255,.32)';ctx.fill();
+    w.parts.forEach(p=>{
+      ctx.beginPath();ctx.arc(x+p.x,y+p.y,p.r,0,7);
+      ctx.fillStyle=p.col;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+      if(p.hl){
+        ctx.strokeStyle='rgba(255,214,226,.85)';ctx.lineWidth=1.4;ctx.stroke();
+        ctx.beginPath();ctx.arc(x+p.x-p.r*.3,y+p.y-p.r*.35,p.r*.34,0,7);
+        ctx.fillStyle='rgba(255,255,255,.8)';ctx.fill();}
+    });
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(x,y,CR,0,7);
+  ctx.strokeStyle='rgba(115,136,168,.60)';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y,CR-3,0,7);
+  ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1;ctx.stroke();
+}
+
+/* ── 중탕 장면 ── */
+function drawBath(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save(); ctx.translate(0,-80);           // 수조·온도계·타이머를 캔버스 정중앙에
+  const bx=103,bw=508,by=150,bh=318;
+  const wy=by+88;
+  const prog = bath ? Math.min(1,bath.t/bath.total) : 1;
+
+  // 김
+  for(let i=0;i<8;i++){
+    const px=bx+40+i*60, ph=(tNow*0.8+i*36)%160;
+    ctx.beginPath();ctx.arc(px+Math.sin(tNow/20+i)*14, wy-28-ph, 13+ph*0.12,0,7);
+    ctx.fillStyle='rgba(148,176,208,'+(0.17*(1-ph/160)*Math.min(1,prog*4))+')';ctx.fill();
+  }
+
+  // 수조
+  ctx.save();
+  ctx.fillStyle='rgba(160,200,245,.10)';roundRect(bx,by,bw,bh,13);ctx.fill();
+  ctx.save();
+  ctx.beginPath();roundRect(bx+5,wy,bw-10,by+bh-wy-5,11);ctx.clip();
+  const g=ctx.createLinearGradient(0,wy,0,by+bh);
+  g.addColorStop(0,'rgba(116,186,252,.55)');g.addColorStop(1,'rgba(46,116,212,.72)');
+  ctx.fillStyle=g;ctx.fillRect(bx,wy,bw,bh);
+  bubbles.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.globalAlpha=b.a;ctx.fill();ctx.globalAlpha=1;});
+  ctx.restore();
+  ctx.beginPath();ctx.moveTo(bx+5,wy+9);
+  for(let x=0;x<=bw-10;x+=6) ctx.lineTo(bx+5+x, wy+Math.sin(x/34+tNow/20)*3);
+  ctx.lineTo(bx+bw-5,wy+11);ctx.closePath();
+  ctx.fillStyle='rgba(186,222,255,.75)';ctx.fill();
+  ctx.strokeStyle='rgba(126,166,212,.75)';ctx.lineWidth=3.5;roundRect(bx,by,bw,bh,13);ctx.stroke();
+  ctx.restore();
+
+  // 온도계
+  const tx=697, ty=142, tl=316;
+  const temp=Math.round(24+64*Math.min(1,prog*3.2));
+  ctx.textAlign='center';ctx.fillStyle='#d97a1f';ctx.font='800 27px Pretendard,sans-serif';
+  ctx.fillText(temp+' ℃', tx, ty-18);
+  ctx.fillStyle='rgba(150,168,195,.7)';ctx.fillRect(tx-46,ty+42,46,9);
+  ctx.fillStyle='rgba(206,220,238,.5)';roundRect(tx-8,ty,16,tl,8);ctx.fill();
+  ctx.strokeStyle='rgba(140,160,190,.7)';ctx.lineWidth=1.6;roundRect(tx-8,ty,16,tl,8);ctx.stroke();
+  const hgt=(temp/100)*(tl-32);
+  ctx.fillStyle='#e4453f';
+  roundRect(tx-4.4,ty+tl-20-hgt,8.8,hgt+13,4.4);ctx.fill();
+  ctx.beginPath();ctx.arc(tx,ty+tl-10,13,0,7);ctx.fillStyle='#e4453f';ctx.fill();
+
+  // 24홈판
+  const pw=436, px0=bx+(bw-pw)/2, py=wy-38;
+  ctx.textAlign='center';
+  for(let c=0;c<6;c++){
+    const x=px0+38+c*(pw-76)/5;
+    ctx.fillStyle='#5c6d87';ctx.font='800 14.5px Pretendard,sans-serif';
+    ctx.fillText(FOODS[c].n, x, py-16);
+  }
+  ctx.save();ctx.shadowColor='rgba(20,45,85,.35)';ctx.shadowBlur=20;ctx.shadowOffsetY=8;
+  const pg=ctx.createLinearGradient(0,py,0,py+72);
+  pg.addColorStop(0,'#f8fbfe');pg.addColorStop(1,'#dbe3f0');
+  ctx.fillStyle=pg;roundRect(px0,py,pw,74,11);ctx.fill();ctx.restore();
+  ctx.strokeStyle='#c4d0e0';ctx.lineWidth=1.4;roundRect(px0,py,pw,74,11);ctx.stroke();
+  for(let c=0;c<6;c++){
+    const x=px0+38+c*(pw-76)/5, y=py+37;
+    ctx.beginPath();ctx.arc(x,y,25,0,7);
+    const wg=ctx.createRadialGradient(x-6,y-7,2,x,y,25);
+    wg.addColorStop(0,'#ffffff');wg.addColorStop(1,'#bdcadd');
+    ctx.fillStyle=wg;ctx.fill();
+    const col=bathWellColor(c);
+    ctx.beginPath();ctx.arc(x,y,20,0,7);ctx.fillStyle=col;ctx.fill();
+    ctx.beginPath();ctx.ellipse(x-6,y-7,7,3.6,-.5,0,7);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,25,0,7);ctx.strokeStyle='rgba(115,136,168,.65)';ctx.lineWidth=2;ctx.stroke();
+  }
+
+  // 타이머
+  const left=Math.max(0,Math.ceil(300*(1-prog)));
+  ctx.textAlign='center';
+  ctx.fillStyle='#16202f';ctx.font='800 54px Pretendard,sans-serif';
+  ctx.fillText(`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`, W/2, 592);
+  ctx.fillStyle='#8493aa';ctx.font='700 15.5px Pretendard,sans-serif';
+  ctx.fillText('베네딕트 반응 · 80~90 ℃ 물에 5분 중탕  (×25 배속)', W/2, 626);
+  ctx.fillStyle='rgba(20,40,80,.10)';roundRect(220,536,400,8,4);ctx.fill();
+  ctx.fillStyle='#f4741f';roundRect(220,536,400*prog,8,4);ctx.fill();
+  ctx.restore();
+}
+// 베네딕트 반응은 푸른색 → 녹색 → 노란색 → 황적색 순으로 변한다
+const BEN_RAMP=[[0,'#4f86d6'],[0.34,'#3fa877'],[0.66,'#e8c31f'],[1,'#e2701f']];
+function benedictColor(t,start){
+  t=Math.max(0,Math.min(1,t));
+  const ramp=[[0,start],...BEN_RAMP.slice(1)];
+  for(let i=0;i<ramp.length-1;i++){
+    const [t0,c0]=ramp[i], [t1,c1]=ramp[i+1];
+    if(t<=t1) return mix(c0,c1,(t-t0)/(t1-t0));
+  }
+  return ramp[ramp.length-1][1];
+}
+function bathWellColor(c){
+  const w=wells[3][c]; if(!w.food) return '#dbe9fa';
+  const F=FOODS.find(f=>f.id===w.food);
+  const prog = bath?Math.min(1,bath.t/bath.total):1;
+  const start = noChangeColor(F,REAG[3]);
+  if(!F.nut.includes('sugar')) return start;
+  return benedictColor((prog-0.3)/0.7, start);
+}
+
+/* ── 입자 생성 ── */
+function makeParts(r,c){
+  const w=wells[r][c]; w.parts=[];
+  if(!isPos(r,c)) return;
+  if(REAG[r].id==='sudan'){
+    for(let i=0;i<12;i++){const a=Math.random()*7,d=Math.random()*(CR-16);
+      w.parts.push({x:Math.cos(a)*d,y:Math.sin(a)*d,r:4.5+Math.random()*6.5,col:'#ff5f83',a:.95,hl:true,
+        vx:(Math.random()-.5)*.16,vy:(Math.random()-.5)*.16});}
+  } else if(REAG[r].id==='benedict'){
+    for(let i=0;i<30;i++){const a=Math.random()*7,d=Math.random()*(CR-12);
+      w.parts.push({x:Math.cos(a)*d,y:Math.sin(a)*d,r:1.8+Math.random()*3,col:'#c0450d',a:.8,hl:false,
+        vx:(Math.random()-.5)*.1,vy:.05+Math.random()*.12});}
+  }
+}
+
+/* ══════════════════════ 진행 로직 ══════════════════════ */
+const colFilled=c=>wells.every(row=>row[c].food);
+const rowFilled=r=>wells[r].every(w=>w.reag);
+const allFoods=()=>[0,1,2,3,4,5].every(colFilled);
+const allReag =()=>[0,1,2,3].every(rowFilled);
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2000);}
+
+// 홈 하나에 직접 떨어뜨린다
+function pourWell(r,c){
+  const kind=sel.kind, id=sel.id, w=wells[r][c];
+  const col = kind==='food' ? FOODS.find(x=>x.id===id).c : REAG[r].base;
+  w.pending=true;
+  const py=cellY(r)-CR-6;
+  drops.push({x:cellX(c),y:py+6,vy:0,color:col,delay:0,ty:cellY(r),py,
+    land:()=>{
+      w.pending=false;
+      if(kind==='food'){ w.food=id; w.fillT=0; }
+      else { w.reag=REAG[r].id; makeParts(r,c); }
+      renderLive(); renderShelf(); refreshNext(); updateProg();
+      const done = kind==='food' ? colFilled(c) : rowFilled(r);
+      if(done){
+        toast(kind==='food' ? `${foodLabel(FOODS[c])} 4홈 완료` : `${REAG[r].n} 6홈 완료`);
+        // 방울이 떨어지는 동안 다음 시약을 이미 골랐다면 그 선택을 지우지 않는다
+        if(sel && sel.kind===kind && sel.id===id){ sel=null; renderShelf(); }
+      }
+      updateHand();
+    }});
+}
+// 지금 선택한 시약·희석액을 넣을 수 있는 홈인가
+function targetOk(r,c){
+  if(!sel||r<0||c<0) return false;
+  const w=wells[r][c];
+  if(w.pending) return false;
+  if(sel.kind==='food') return FOODS[c].id===sel.id && !w.food;
+  return REAG[r].id===sel.id && !!w.food && !w.reag;
+}
+function updateProg(){
+  const el=document.getElementById('stProg');
+  if(step===2||step===3){
+    const key = step===2?'food':'reag';
+    const n = wells.flat().filter(w=>w[key]).length;
+    el.textContent=`${n} / 24 홈`; el.classList.add('on');
+  } else el.classList.remove('on');
+}
+
+function cellAt(mx,my){
+  let c=-1,r=-1;
+  if(mx>PLATE.x&&mx<PLATE.x+PLATE.w&&my>PLATE.y&&my<PLATE.y+PLATE.h){
+    for(let i=0;i<6;i++) if(Math.abs(mx-cellX(i))<CDX/2) c=i;
+    for(let i=0;i<4;i++) if(Math.abs(my-cellY(i))<CDY/2) r=i;
+  }
+  return [r,c];
+}
+function onCanvasClick(mx,my){
+  if(bath){return;}
+  if(step!==2&&step!==3){return;}
+  if(!sel){toast('먼저 왼쪽에서 넣을 것을 고르세요');return;}
+  const [r,c]=cellAt(mx,my);          // 터치는 hover가 없으므로 좌표로 직접 판정
+  hoverR=r; hoverC=c;
+  if(r<0||c<0){toast('홈판의 홈을 클릭하세요');return;}
+  const w=wells[r][c];
+  if(w.pending){return;}
+  if(sel.kind==='food'){
+    if(FOODS[c].id!==sel.id){toast(`${FOODS[c].n} 세로 줄에는 ${foodLabel(FOODS[c])}을 넣습니다`);return;}
+    if(w.food){toast('이미 넣은 홈입니다');return;}
+  } else {
+    if(REAG[r].id!==sel.id){toast(`이 가로 줄은 ${REAG[r].n} 자리입니다`);return;}
+    if(!w.food){toast('이 홈에는 아직 희석액이 없습니다');return;}
+    if(w.reag){toast('이미 넣은 홈입니다');return;}
+  }
+  pourWell(r,c);
+}
+
+cv.addEventListener('mousemove',e=>{
+  const b=cv.getBoundingClientRect(), k=W/b.width;
+  const mx=(e.clientX-b.left)*k, my=(e.clientY-b.top)*k;
+  [hoverR,hoverC]=cellAt(mx,my);
+  cv.style.cursor = (sel&&targetOk(hoverR,hoverC))?'pointer':'default';
+});
+cv.addEventListener('mouseleave',()=>{hoverC=-1;hoverR=-1;});
+cv.addEventListener('click',e=>{const b=cv.getBoundingClientRect(),k=W/b.width;
+  onCanvasClick((e.clientX-b.left)*k,(e.clientY-b.top)*k);});
+
+/* ── 애니메이션 루프 ── */
+function loop(){
+  tNow++;
+  drops=drops.filter(d=>{
+    if(d.delay>0){d.delay--;return true;}
+    d.vy+=0.62; d.y+=d.vy;
+    if(d.y>=d.ty){
+      d.land();
+      for(let i=0;i<8;i++)splash.push({x:d.x,y:d.ty,r:1+Math.random()*2.4,
+        vx:(Math.random()-.5)*3.4,vy:-Math.random()*2.4,life:1,color:d.color});
+      return false;
+    }
+    return true;
+  });
+  splash=splash.filter(s=>{s.x+=s.vx;s.y+=s.vy;s.vy+=.22;s.life-=.05;return s.life>0;});
+  for(let r=0;r<4;r++)for(let c=0;c<6;c++){
+    const w=wells[r][c];
+    if(w.food&&w.fillT<1)w.fillT+=0.06;
+    w.parts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      const d=Math.hypot(p.x,p.y);
+      if(d>CR-12-p.r){const a=Math.atan2(p.y,p.x);p.x=Math.cos(a)*(CR-10-p.r);p.y=Math.sin(a)*(CR-10-p.r);p.vx*=-.7;p.vy*=-.7;}
+      if(REAG[r].id==='benedict'&&p.y>CR-16-p.r){p.vy*=-.25;}
+    });
+  }
+  if(bath){
+    bath.t++;
+    if(Math.random()<.6)bubbles.push({x:115+Math.random()*484,y:458,r:1.8+Math.random()*3.8,a:.75,v:.6+Math.random()*1.3});
+    bubbles=bubbles.filter(b=>{b.y-=b.v;b.a-=.004;return b.y>244&&b.a>0;});
+    if(bath.t>=bath.total&&!bath.done){
+      bath.done=true;
+      for(let c=0;c<6;c++){wells[3][c].heated=true;makeParts(3,c);}
+      renderLive();
+      setTimeout(()=>{bath=null;go(4);
+        toast('베네딕트 용액을 넣은 홈의 색 변화를 증류수 홈과 비교해 보세요');},900);
+    }
+  }
+  if(step<=4){ (bath?drawBath:drawPlate)(); }
+  requestAnimationFrame(loop);
+}
+
+/* ══════════════════════ UI 렌더 ══════════════════════ */
+function renderSteps(){
+  document.getElementById('steps').innerHTML = STEPS.map((s,i)=>
+    `<div class="chip ${i===step?'on':(i<step?'done':'')}"><b>${i+1}</b>${s}</div>`).join('');
+}
+function renderShelf(){
+  document.getElementById('foodShelf').innerHTML = FOODS.map((f,c)=>
+    `<div class="btl ${sel&&sel.kind==='food'&&sel.id===f.id?'sel':''} ${colFilled(c)?'used':''}" data-k="food" data-id="${f.id}">
+       <div class="cap" style="background:${f.c}"></div>
+       <div class="nm">${foodLabel(f)}</div>
+       ${colFilled(c)?'<div class="tick">✓</div>':''}</div>`).join('');
+  document.getElementById('reagShelf').innerHTML = REAG.map((r,i)=>
+    `<div class="btl ${sel&&sel.kind==='reag'&&sel.id===r.id?'sel':''} ${rowFilled(i)?'used':''}" data-k="reag" data-id="${r.id}">
+       <div class="cap" style="background:${r.base}"></div>
+       <div class="nm">${r.n}</div>
+       ${rowFilled(i)?'<div class="tick">✓</div>':''}</div>`).join('');
+  document.getElementById('foodShelf').style.opacity = step===2?1:.4;
+  document.getElementById('reagShelf').style.opacity = step===3?1:.4;
+  document.querySelectorAll('.btl').forEach(el=>el.onclick=()=>{
+    if(step!==2&&step!==3){toast('지금 단계에서는 사용할 수 없습니다');return;}
+    const k=el.dataset.k,id=el.dataset.id;
+    if(k==='food'&&step!==2){toast('희석액은 이미 다 넣었습니다');return;}
+    if(k==='reag'&&step!==3){toast('먼저 6가지 희석액을 홈판에 모두 넣으세요');return;}
+    if(el.classList.contains('used')){toast('이미 넣었습니다');return;}
+    sel={kind:k,id};renderShelf();updateHand();
+  });
+}
+function updateHand(){
+  const h=document.getElementById('hand');
+  if(!sel){h.innerHTML='스포이트가 비어 있습니다.<br>왼쪽에서 넣을 것을 먼저 고르세요.';return;}
+  if(sel.kind==='food'){const f=FOODS.find(x=>x.id===sel.id), c=FOODS.indexOf(f);
+    const n=wells.filter(row=>row[c].food).length;
+    h.innerHTML=`스포이트에 <b>${foodLabel(f)}</b> · <span style="color:#11396f">${n} / 4 홈</span><br><b>${f.n}</b> 세로 줄의 홈을 하나씩 클릭`;}
+  else{const r=REAG.find(x=>x.id===sel.id);
+    const ri=REAG.indexOf(r), n=wells[ri].filter(w=>w.reag).length;
+    h.innerHTML=`스포이트에 <b>${r.n}</b> · <span style="color:#11396f">${n} / 6 홈</span><br>해당 <b>가로 줄</b>의 홈을 하나씩 클릭`;}
+}
+function renderLive(){
+  const el0=document.getElementById('liveTbl'); if(!el0) return;   // 실험 중에는 기록표를 띄우지 않는다
+  let html='<tr><th style="width:56px">구분</th>'+FOODS.map(f=>`<th>${f.sn}</th>`).join('')+'</tr>';
+  REAG.forEach((R,r)=>{
+    let row='';
+    for(let c=0;c<6;c++){
+      const t=resultText(r,c);
+      if(!t) row+='<td class="e">·</td>';
+      else if(isPos(r,c)) row+=`<td style="background:${R.pos};color:#fff">${t}</td>`;
+      else if(t==='가열 전') row+='<td class="e">가열 전</td>';
+      else row+=`<td>${t}</td>`;
+    }
+    html+=`<tr><td class="rl">${R.sh}</td>${row}</tr>`;
+  });
+  document.getElementById('liveTbl').innerHTML=html;
+}
+function renderKey(){
+  const rows=[['녹말',REAG[0].n,'아이오딘 반응',REAG[0].baseTx,REAG[0].posTx,REAG[0].base,REAG[0].pos],
+    ['포도당','베네딕트 용액(중탕)','베네딕트 반응',REAG[3].baseTx,REAG[3].posTx,REAG[3].base,REAG[3].pos],
+    ['단백질','뷰렛 용액','뷰렛 반응',REAG[1].baseTx,REAG[1].posTx,REAG[1].base,REAG[1].pos],
+    ['지방','수단 Ⅲ 용액','수단 Ⅲ 반응',REAG[2].baseTx,REAG[2].posTx,REAG[2].base,REAG[2].pos]];
+  document.getElementById('keyTbl').innerHTML=
+    '<tr><th>영양소</th><th>검출 용액</th><th>반응 색깔</th></tr>'+
+    rows.map(r=>`<tr><td>${r[0]}</td><td style="font-size:13px;color:#6b7d97">${r[1]}</td>
+      <td><span class="dot" style="background:${r[5]}"></span>${r[3]} → <span class="dot" style="background:${r[6]}"></span>${r[4]}</td></tr>`).join('');
+}
+function renderGear(){
+  document.getElementById('gear').innerHTML = GEARS.map(g=>{
+    const on=!!gearOn[g.id];
+    return `<div class="gcard ${on?'on':''}" data-g="${g.id}">${gearSvg(g.id,on)}
+      <div class="gn">${g.n}</div><div class="gd">${g.d}</div></div>`;
+  }).join('');
+  document.querySelectorAll('.gcard').forEach(el=>el.onclick=()=>{
+    gearOn[el.dataset.g]=!gearOn[el.dataset.g];renderGear();refreshNext();});
+}
+function gearSvg(id,on){
+  const s=on?'#12a06a':'#9aa8bd', f=on?'rgba(26,158,106,.13)':'rgba(120,140,175,.07)';
+  const A={
+    coat:`<path d="M20 14 L32 8 L44 14 L48 26 L42 28 L42 56 L22 56 L22 28 L16 26 Z" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 8 L32 30" stroke="${s}" stroke-width="2.4"/>`,
+    gog:`<rect x="8" y="22" width="48" height="22" rx="11" fill="${f}" stroke="${s}" stroke-width="2.4"/><path d="M4 30 L8 30 M56 30 L60 30" stroke="${s}" stroke-width="2.4"/><path d="M32 24 L32 42" stroke="${s}" stroke-width="2.2"/>`,
+    glv:`<path d="M20 56 L20 26 Q20 20 25 20 Q30 20 30 26 L30 14 Q30 8 35 8 Q40 8 40 14 L40 28 L46 24 Q51 22 51 28 L46 50 Q44 56 38 56 Z" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linejoin="round"/>`,
+    heat:`<path d="M18 56 L18 28 Q18 20 26 20 L38 20 Q46 20 46 28 L46 56 Z" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linejoin="round"/><path d="M46 28 L54 32 Q57 36 52 40 L46 42" fill="${f}" stroke="${s}" stroke-width="2.4" stroke-linejoin="round"/><path d="M26 12 Q30 8 28 4 M36 12 Q40 8 38 4" stroke="${s}" stroke-width="2.2" fill="none"/>`
+  }[id];
+  return `<svg viewBox="0 0 64 64">${A}</svg>`;
+}
+function renderPredict(){
+  const list=FOODS.slice(1);
+  document.getElementById('ptbl').innerHTML=list.map(f=>{
+    const fixed=f.id==='tteok';
+    return `<tr><td class="pfood">${f.n}</td><td><div class="nchips">`+
+      Object.keys(NUT).map(k=>{
+        const on=predict[f.id].has(k);
+        return `<div class="nchip ${fixed?(on?'fixed':''):(on?'on':'')}" data-f="${f.id}" data-n="${k}" ${fixed?'data-lock=1':''}>${NUT[k]}</div>`;
+      }).join('')+`</div></td></tr>`;
+  }).join('');
+  document.querySelectorAll('#ptbl .nchip').forEach(el=>el.onclick=()=>{
+    if(el.dataset.lock)return;
+    const s=predict[el.dataset.f]; s.has(el.dataset.n)?s.delete(el.dataset.n):s.add(el.dataset.n);
+    renderPredict();
+  });
+}
+function renderResult(){
+  // 결과 표
+  let h='<tr><th rowspan="2" style="width:150px">구분</th><th rowspan="2" style="width:92px">증류수</th><th colspan="5">음식물 희석액</th></tr><tr>'+
+    FOODS.slice(1).map(f=>`<th>${f.n}</th>`).join('')+'</tr>';
+  REAG.forEach((R,r)=>{
+    h+='<tr><td class="rl">'+R.n+'</td>';
+    for(let c=0;c<6;c++){
+      const t=resultText(r,c)||'—';
+      h += isPos(r,c) ? `<td style="background:${R.pos};color:#fff">${t}</td>` : `<td style="color:#93a7c6">${t}</td>`;
+    }
+    h+='</tr>';
+  });
+  document.getElementById('rtbl').innerHTML=h;
+  // 판정
+  document.getElementById('jtbl').innerHTML=FOODS.slice(1).map(f=>
+    `<tr><td class="pfood">${f.n}</td><td><div class="nchips">`+
+    Object.keys(NUT).map(k=>{
+      const on=judge[f.id].has(k), truth=f.nut.includes(k);
+      let cls = on?'on':'';
+      if(judged){ cls = on ? (truth?'right':'wrong') : (truth?'miss':''); }
+      return `<div class="nchip ${cls}" data-f="${f.id}" data-n="${k}">${NUT[k]}</div>`;
+    }).join('')+'</div></td></tr>').join('');
+  if(!judged) document.querySelectorAll('#jtbl .nchip').forEach(el=>el.onclick=()=>{
+    const s=judge[el.dataset.f]; s.has(el.dataset.n)?s.delete(el.dataset.n):s.add(el.dataset.n);
+    renderResult();
+  });
+}
+
+/* ── 단계 전환 ── */
+const GUIDE=[
+ '실험복·보안경·실험용 장갑·내열 장갑을 모두 착용해야 실험을 시작할 수 있습니다.',
+ '떡에 가장 많이 들어 있는 영양소는 녹말입니다. 나머지 네 가지를 근거를 들어 예상해 보세요.',
+ '왼쪽에서 희석액을 고른 뒤, 같은 이름 세로 줄의 홈을 하나씩 클릭해 2 mL씩 넣으세요.',
+ '시약을 고른 뒤 해당 가로 줄의 홈을 하나씩 클릭해 2~3방울씩 넣고, 증류수 홈과 비교해 관찰하세요.',
+ '80~90 ℃ 물이 담긴 수조에 24홈판을 띄우고, 5분 뒤 색 변화를 관찰합니다.',
+ '색 변화를 근거로 각 음식물의 영양소를 정리해 보세요. 지방은 선홍색 방울로 보입니다.',
+];
+function go(n){
+  step=Math.max(0,Math.min(5,n));
+  renderSteps();
+  document.getElementById('stNo').textContent=step+1;
+  const heated=wells[3][0].heated;
+  const sub=(step===4&&heated)
+    ? '베네딕트 용액을 넣은 맨 아래 줄의 색 변화를 증류수 홈과 비교해 보세요. 황적색 홈에는 당이 들어 있습니다.'
+    : GUIDE[step];
+  document.getElementById('stTx').innerHTML=`${STEPS[step]}<em>${sub}</em>`;
+  ['vSafety','vPredict','vResult'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  const box=document.getElementById('cbox'); box.classList.remove('hide');
+  if(step===0){document.getElementById('vSafety').classList.add('on');box.classList.add('hide');renderGear();}
+  if(step===1){document.getElementById('vPredict').classList.add('on');box.classList.add('hide');renderPredict();}
+  if(step===5){document.getElementById('vResult').classList.add('on');box.classList.add('hide');renderResult();}
+  if(step===4&&!bath&&!wells[3][0].heated){bath={t:0,total:300,done:false};bubbles=[];}
+  sel=null;renderShelf();updateHand();renderLive();refreshNext();updateProg();
+}
+function refreshNext(){
+  const b=document.getElementById('btnNext'), p=document.getElementById('btnPrev');
+  p.disabled = step===0 || (step===4&&bath);
+  b.className='bt pri'; b.disabled=false;
+  if(step===0){b.textContent='실험 시작';b.disabled=!GEARS.every(g=>gearOn[g.id]);}
+  else if(step===1){b.textContent='예상 기록 완료';}
+  else if(step===2){b.textContent='희석액 다 넣었어요';b.disabled=!allFoods();}
+  else if(step===3){b.textContent='중탕하러 가기';b.disabled=!allReag();b.className='bt warm';}
+  else if(step===4){b.textContent=bath?'가열 중…':(unlocked?'결과 정리':'결과 정리 🔒');b.disabled=!!bath;
+    if(!bath)b.className='bt pri';}
+  else{b.textContent=judged?'처음부터':'예상과 비교하기';}
+}
+document.getElementById('btnNext').onclick=()=>{
+  if(step===5){ if(!judged){judged=true;renderResult();showVerdict();refreshNext();} else location.reload(); return;}
+  if(step===2&&!allFoods())return;
+  if(step===3&&!allReag())return;
+  if(step===4&&!unlocked){ openLock(); return; }   // 결과 정리는 비밀번호 확인 후
+  go(step+1);
+};
+document.getElementById('btnPrev').onclick=()=>{if(step===5){judged=false;} go(step-1);};
+
+function showVerdict(){
+  let ok=0, pre=0;
+  FOODS.slice(1).forEach(f=>{
+    const t=new Set(f.nut);
+    if(t.size===judge[f.id].size && [...t].every(k=>judge[f.id].has(k))) ok++;
+    if(t.size===predict[f.id].size && [...t].every(k=>predict[f.id].has(k))) pre++;
+  });
+  const el=document.getElementById('jmsg');
+  el.style.display='block';
+  el.innerHTML=`<b>정리 ${ok} / 5 정확 · 처음 예상은 ${pre} / 5 적중</b><br>
+    어묵처럼 여러 영양소가 함께 든 음식물도 있고, 주스의 바이타민 C는 아이오딘 용액을 무색으로 만들지만 이건 녹말 반응이 아닙니다.`;
+}
+
+/* ── 전체화면 ── */
+const ICON_EXPAND='<path d="M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+const ICON_SHRINK='<path d="M3 9h6V3M21 9h-6V3M3 15h6v6M21 15h-6v6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>';
+function isFull(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+function toggleFull(){
+  try{
+    if(isFull()){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+    else { const e=document.documentElement; (e.requestFullscreen||e.webkitRequestFullscreen).call(e); }
+  }catch(err){ toast('이 브라우저에서는 전체화면을 쓸 수 없습니다'); }
+}
+function syncFull(){
+  const f=isFull();
+  document.getElementById('fsIcon').innerHTML = f?ICON_SHRINK:ICON_EXPAND;
+  document.getElementById('fsTx').textContent = f?'창 모드':'전체화면';
+  document.getElementById('btnFull').title = f?'창 모드로 (F)':'전체화면 (F)';
+  setTimeout(fit,80);
+}
+document.getElementById('btnFull').onclick=toggleFull;
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,syncFull));
+syncFull();
+
+/* ── 결과 정리 잠금 ── */
+const PASS='0315';
+let unlocked=false, pin='';
+const lockEl=document.getElementById('lock');
+document.getElementById('lkPad').innerHTML=
+  [1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')+
+  '<button class="sm" data-k="del">지움</button><button data-k="0">0</button><button class="sm" data-k="esc">취소</button>';
+document.getElementById('lkPad').onclick=e=>{
+  const b=e.target.closest('button'); if(!b)return; pinKey(b.dataset.k);
+};
+function drawDots(){
+  document.getElementById('lkDots').innerHTML=[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('');
+}
+function openLock(){ pin=''; drawDots(); document.getElementById('lkMsg').innerHTML='&nbsp;'; lockEl.classList.add('on'); }
+function closeLock(){ lockEl.classList.remove('on'); }
+function pinKey(k){
+  const msg=document.getElementById('lkMsg');
+  if(k==='esc'){closeLock();return;}
+  if(k==='del'){pin=pin.slice(0,-1);drawDots();msg.innerHTML='&nbsp;';return;}
+  if(!/^[0-9]$/.test(k)||pin.length>=4)return;
+  pin+=k; drawDots(); msg.innerHTML='&nbsp;';
+  if(pin.length===4){
+    if(pin===PASS){ unlocked=true; setTimeout(()=>{closeLock();go(5);},180); }
+    else { msg.textContent='숫자가 맞지 않습니다';
+      lockEl.querySelector('.lockbox').classList.add('shake');
+      setTimeout(()=>{lockEl.querySelector('.lockbox').classList.remove('shake');pin='';drawDots();},400); }
+  }
+}
+drawDots();
+
+/* ── 키보드 ── */
+addEventListener('keydown',e=>{
+  if(lockEl.classList.contains('on')){
+    e.preventDefault();
+    if(/^[0-9]$/.test(e.key)) pinKey(e.key);
+    else if(e.key==='Backspace') pinKey('del');
+    else if(e.key==='Escape') pinKey('esc');
+    return;
+  }
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();
+    const b=document.getElementById('btnNext'); if(!b.disabled)b.click();}
+  if(e.key==='ArrowLeft'){e.preventDefault();
+    const b=document.getElementById('btnPrev'); if(!b.disabled)b.click();}
+  if(e.key==='-'||e.key==='_'){e.preventDefault();setZoom(-1);}
+  if(e.key==='='||e.key==='+'){e.preventDefault();setZoom(1);}
+  if(e.key==='f'||e.key==='F'||e.key==='ㄹ'){e.preventDefault();toggleFull();}
+  if(e.key==='t'||e.key==='T'||e.key==='ㅅ')document.getElementById('tip').classList.toggle('on');
+  if(e.key==='r'||e.key==='R'||e.key==='ㄱ')location.reload();
+  if(e.key==='Escape')document.getElementById('tip').classList.remove('on');
+});
+
+/* ── 화면 배율 & 스케일 ── */
+const BASE_W=1600, BASE_H=1000;              // 16:10
+const ZOOMS=[100,110,120,130,140,150];
+let zi=ZOOMS.indexOf(130);
+const stageEl=document.getElementById('stage');
+
+function applyZoom(){
+  const z=ZOOMS[zi]/100;
+  const w=Math.round(BASE_W/z);
+  stageEl.style.width  = w+'px';
+  stageEl.style.height = Math.round(BASE_H/z)+'px';
+  stageEl.classList.toggle('narrow',  w<1400);
+  stageEl.classList.toggle('xnarrow', w<1150);
+  document.getElementById('zVal').textContent = ZOOMS[zi]+'%';
+  document.getElementById('zOut').disabled = zi===0;
+  document.getElementById('zIn').disabled  = zi===ZOOMS.length-1;
+  fit();
+}
+function setZoom(d){
+  const n=Math.max(0,Math.min(ZOOMS.length-1,zi+d));
+  if(n===zi) return;
+  zi=n; applyZoom(); toast(`화면 배율 ${ZOOMS[zi]}%`);
+}
+document.getElementById('zIn').onclick =()=>setZoom(1);
+document.getElementById('zOut').onclick=()=>setZoom(-1);
+
+// 캔버스는 840×660 논리 좌표를 유지한 채, 화면 해상도에 맞춰 또렷하게 그린다
+function resizeCanvas(fitScale){
+  const box=document.getElementById('cbox');
+  const bw=box.clientWidth, bh=box.clientHeight;
+  if(!bw||!bh) return;
+  const s=Math.min(bw/W, bh/H);
+  cv.style.width=(W*s)+'px'; cv.style.height=(H*s)+'px';
+  const q=Math.max(1,Math.min(3, s*fitScale*(window.devicePixelRatio||1)));
+  const bwPx=Math.round(W*q), bhPx=Math.round(H*q);
+  if(cv.width!==bwPx||cv.height!==bhPx){ cv.width=bwPx; cv.height=bhPx; }
+  ctx.setTransform(q,0,0,q,0,0);
+}
+function fit(){
+  const w=stageEl.offsetWidth, h=stageEl.offsetHeight;
+  const s=Math.min(innerWidth/w, innerHeight/h);
+  stageEl.style.transform=`scale(${s})`;
+  resizeCanvas(s);
+}
+addEventListener('resize',fit);
+applyZoom();
+
+renderKey();renderLive();go(0);loop();
+</script>
+</body>
+</html>
