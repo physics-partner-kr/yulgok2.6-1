@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>팬플루트로 배우는 파동과 파장</title>
+<style>
+:root{
+  --tx:#eef3fb;--mut:#9db0cf;--line:rgba(160,190,240,.18);
+  --acc:#5aa9ff;--air:#7fd3ff;--red:#ff4d5a;--yel:#ffd23f;
+  --ok:#3ddc97;--warn:#ffb454;--bad:#ff6b7a;--pink:#ff8ac2;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#050a14;
+  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR','Noto Sans CJK KR','WenQuanYi Zen Hei',sans-serif;
+  -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;
+  transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center center;
+  background:radial-gradient(1200px 700px at 78% -10%,#1b3159 0%,rgba(27,49,89,0) 60%),
+             linear-gradient(170deg,#0d1a31 0%,#0a1427 55%,#081020 100%);
+  color:var(--tx);overflow:hidden}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus{outline:none}
+
+header{position:absolute;left:0;right:0;top:0;height:84px;display:flex;align-items:center;padding:0 36px;gap:16px;
+  border-bottom:1px solid rgba(160,190,240,.08)}
+.brand{font-size:23px;font-weight:800;letter-spacing:-.5px;white-space:nowrap}
+.brand span{color:var(--mut);font-weight:600;font-size:18px;margin-left:8px}
+.chips{display:flex;gap:6px;margin-left:auto}
+.chip{font-size:18px;font-weight:700;padding:8px 12px;border-radius:999px;color:var(--mut);
+  background:rgba(255,255,255,.04);border:1px solid var(--line);white-space:nowrap;transition:.2s}
+.chip.done{color:var(--ok);border-color:rgba(61,220,151,.35)}
+.chip.on{background:linear-gradient(135deg,#4c9dff,#2f6fe0);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(47,111,224,.45)}
+.chip.lk{opacity:.4;cursor:default}
+#lockBtn{width:50px;height:50px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+#lockBtn.open{background:rgba(255,180,84,.18);border-color:var(--warn)}
+#tBadge{font-size:17px;font-weight:700;color:var(--warn);white-space:nowrap}
+
+main{position:absolute;left:0;right:0;top:84px;bottom:88px}
+.scene{position:absolute;inset:0;padding:10px 44px 0;display:none}
+.scene.on{display:block;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font-size:40px;font-weight:800;letter-spacing:-1px;margin:4px 0 14px;height:52px;white-space:nowrap}
+.row{display:flex;gap:24px}
+.col{display:flex;flex-direction:column;gap:16px}
+.card{background:linear-gradient(180deg,rgba(28,46,80,.92),rgba(19,33,60,.92));border:1px solid var(--line);border-radius:24px}
+.pad{padding:18px 24px}
+.ttl{font-size:24px;font-weight:800;color:#bcd3f5;margin-bottom:8px;letter-spacing:-.3px}
+.lead{font-size:30px;line-height:1.5;color:#dbe6f7}
+.body{font-size:26px;line-height:1.55;color:#dbe6f7}
+.note{font-size:21px;line-height:1.45;color:var(--mut)}
+.hl{color:var(--yel)}
+.hb{color:var(--air)}
+.hp{color:var(--pink)}
+.hidden{display:none!important}
+
+.btn{font-size:26px;font-weight:700;padding:13px 24px;border-radius:16px;border:1px solid var(--line);
+  background:rgba(255,255,255,.07);transition:.15s;white-space:nowrap}
+.btn:hover{background:rgba(255,255,255,.13)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,#4c9dff,#2f6fe0);border-color:transparent;box-shadow:0 6px 18px rgba(47,111,224,.35)}
+.btn.sm{font-size:22px;padding:10px 16px;border-radius:12px}
+.btn.on{background:rgba(255,210,63,.2);border-color:var(--yel);color:#fff3c4}
+.btn[disabled]{opacity:.35;cursor:default}
+
+footer{position:absolute;left:0;right:0;bottom:0;height:88px;display:flex;align-items:center;padding:0 36px;gap:22px;
+  border-top:1px solid rgba(160,190,240,.08)}
+#hint{flex:1;text-align:center;font-size:22px;color:var(--mut);transition:color .2s}
+#hint.warn{color:var(--warn)}
+#pos{font-size:22px;color:var(--mut);font-weight:700;min-width:80px;text-align:center}
+#nextBtn.locked{background:rgba(255,255,255,.06);box-shadow:none;color:var(--mut)}
+.nudge{animation:nudge .45s}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+.quiz .q{font-size:27px;font-weight:700;line-height:1.42;margin-bottom:12px;letter-spacing:-.3px}
+.opts{display:grid;gap:10px}
+.opt{font-size:24px;font-weight:600;padding:12px 14px;border-radius:14px;text-align:left;
+  background:rgba(255,255,255,.06);border:2px solid rgba(160,190,240,.22);display:flex;gap:12px;align-items:center;line-height:1.3}
+.opt:hover{background:rgba(255,255,255,.12)}
+.opt .ol{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);font-size:19px;
+  display:flex;align-items:center;justify-content:center;font-weight:800}
+.opt.wrong{border-color:var(--bad);color:#ffb3bb;opacity:.75;animation:nudge .4s}
+.opt.right{border-color:var(--ok);background:rgba(61,220,151,.18);color:#c9ffe6}
+.opts.done .opt:not(.right){opacity:.35}
+.compact .ol{display:none}
+.compact .opt{justify-content:center;text-align:center}
+.fb{font-size:22px;line-height:1.45;margin-top:10px;color:var(--mut)}
+.fb .lb{margin-right:8px;font-weight:800}
+.fb.ok .lb{color:var(--ok)}
+.fb.hint .lb{color:var(--warn)}
+.fb b{color:#fff}
+
+.tube{cursor:pointer}
+.tube .air{transition:fill .15s}
+.tube.on .air{fill:#a9e6ff;fill-opacity:.7}
+.tube.on .glass{stroke:#fff;filter:drop-shadow(0 0 10px #7fd3ff)}
+.tube.sel .glass{stroke:var(--air);stroke-width:4}
+.tube.next .glass{stroke:var(--yel);stroke-width:5;animation:blink 1s infinite}
+@keyframes blink{50%{stroke-opacity:.35}}
+.tube .len{font-size:21px;font-weight:800;fill:#dbe6f7}
+
+.kicker{font-size:22px;font-weight:700;color:var(--acc);margin-bottom:10px;letter-spacing:.5px}
+.big{font-size:62px;font-weight:900;letter-spacing:-2px;line-height:1.15;margin-bottom:16px}
+.qcard{margin:22px 0 20px;padding:20px 26px;border-radius:22px;background:rgba(255,210,63,.09);border:1px solid rgba(255,210,63,.35)}
+.qlabel{font-size:20px;font-weight:800;color:var(--yel);margin-bottom:6px}
+.qtext{font-size:31px;font-weight:700;line-height:1.45}
+.goal{font-size:24px;color:#cfdcf1;line-height:1.6}
+.goal b{color:var(--acc)}
+
+.def{font-size:24px;line-height:1.5;padding:9px 0;border-top:1px solid rgba(160,190,240,.12)}
+.def:first-child{border-top:none}
+.def>b:first-child{display:inline-block;min-width:96px}
+.ctl{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:700}
+.ctl .lab{width:92px;color:var(--mut)}
+.ctl .val{min-width:120px;text-align:center;font-size:26px;font-variant-numeric:tabular-nums}
+.callout{font-size:25px;line-height:1.5;padding:16px 20px;border-radius:18px;background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.4)}
+.formula{font-size:28px;font-weight:800;padding:14px 20px;border-radius:16px;background:rgba(90,169,255,.12);border:1px solid rgba(90,169,255,.4);line-height:1.5}
+.tag{display:inline-block;font-size:18px;font-weight:800;padding:3px 11px;border-radius:999px;background:rgba(255,180,84,.18);color:var(--warn);margin-left:8px;vertical-align:middle}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cmp>div{padding:14px 18px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:23px;line-height:1.5}
+.cmp .h{font-size:27px;font-weight:900;margin-bottom:4px}
+
+table{width:100%;border-collapse:collapse;font-size:23px;font-variant-numeric:tabular-nums}
+th{font-size:19px;color:var(--mut);text-align:left;font-weight:700;padding:4px 6px 8px}
+td{padding:6px 6px;border-top:1px solid rgba(160,190,240,.12);font-weight:700}
+.tabs{display:flex;gap:8px}
+.tabs button{flex:1;font-size:23px;font-weight:800;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.06);border:2px solid var(--line)}
+.tabs button.on{border-color:var(--acc);background:rgba(90,169,255,.2)}
+.tabs button.ok::after{content:' ✓';color:var(--ok)}
+.meter{height:18px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#2f6fe0,#5aa9ff,#ffd23f);transition:width .12s}
+.big3{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}
+
+.song{display:flex;flex-wrap:nowrap;gap:5px;margin:10px 0 12px}
+.song span{width:38px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:800;background:rgba(255,255,255,.06);color:var(--mut)}
+.song span.gap{margin-right:10px}
+.song span.done{background:rgba(61,220,151,.2);color:var(--ok)}
+.song span.cur{background:var(--yel);color:#1b1b1b}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kv>div{padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05)}
+.kv .k{font-size:18px;color:var(--mut);font-weight:700}
+.kv .v{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}
+.kv .v small{font-size:19px;color:var(--mut)}
+
+.mk{list-style:none;display:flex;flex-direction:column;gap:6px}
+.mk li{display:flex;gap:12px;align-items:flex-start;font-size:21px;line-height:1.35;padding:5px 10px;border-radius:14px;opacity:.38;transition:.3s}
+.mk li.cur{opacity:1;background:rgba(90,169,255,.12);border:1px solid rgba(90,169,255,.4);font-size:23px}
+.mk li.done{opacity:.6}
+.mk .n{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:#2f6fe0;color:#fff;font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center}
+.pick8{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.pick8 button{font-size:21px;font-weight:800;height:46px;border-radius:10px;background:rgba(255,255,255,.06);border:2px solid var(--line)}
+.pick8 button.on{border-color:var(--acc);background:rgba(90,169,255,.22)}
+
+.sent{font-size:31px;line-height:2.05;font-weight:700;letter-spacing:-.4px}
+.blank{display:inline-block;min-width:140px;height:54px;line-height:46px;vertical-align:middle;margin:0 5px;padding:0 12px;text-align:center;
+  border-radius:12px;border:3px dashed rgba(160,190,240,.45);color:var(--yel);cursor:pointer;transition:.15s}
+.blank.sel{border-color:var(--yel);background:rgba(255,210,63,.12)}
+.blank.right{border-style:solid;border-color:var(--ok);color:var(--ok);background:rgba(61,220,151,.12);cursor:default}
+.blank.wrong{border-style:solid;border-color:var(--bad);color:var(--bad)}
+.blank sup{font-size:16px;color:var(--mut)}
+.bank{display:flex;flex-wrap:wrap;gap:10px}
+.tok{font-size:25px;font-weight:800;padding:10px 18px;border-radius:14px;background:rgba(90,169,255,.14);border:2px solid rgba(90,169,255,.45)}
+.tok:hover{background:rgba(90,169,255,.26)}
+.qn{font-size:22px;font-weight:800;color:var(--acc);margin-bottom:10px}
+#box9 .fb{font-size:26px}
+
+#modal{position:absolute;inset:0;background:rgba(3,7,15,.72);display:flex;align-items:center;justify-content:center;z-index:50}
+.mbox{width:520px;padding:30px;border-radius:26px;background:#14223d;border:1px solid var(--line);text-align:center}
+.mt{font-size:30px;font-weight:800;margin-bottom:8px}
+.pw{height:60px;margin:18px 0;display:flex;justify-content:center;gap:14px;align-items:center}
+.pw i{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.15)}
+.pw i.f{background:var(--yel)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.keys button{font-size:30px;font-weight:800;height:66px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+#pwMsg{font-size:21px;color:var(--bad);height:30px;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<header>
+  <div class="brand">팬플루트로 배우는 파동<span>파장 · 진동수</span></div>
+  <div class="chips" id="chips"></div>
+  <div id="tBadge" class="hidden">교사 모드</div>
+  <button id="lockBtn" title="교사용 잠금 해제"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9db0cf" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path id="shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
+</header>
+
+<main>
+<!-- 0 도입 -->
+<section class="scene" id="s0">
+  <div class="row" style="height:100%;gap:52px;align-items:center;padding-bottom:20px">
+    <div class="card" style="width:640px;height:690px;display:flex;align-items:center;justify-content:center">
+      <svg id="fl0" width="600" height="660"></svg>
+    </div>
+    <div style="flex:1">
+      <div class="kicker">중학교 1학년 과학 · 빛과 파동</div>
+      <div class="big">팬플루트로 배우는<br>파동과 파장</div>
+      <p class="lead">시험관 8개로 <b class="hl">솔·라·시·도·레·미·파·솔</b>을 내는 팬플루트.<br>관 속에서는 어떤 일이 일어나고 있을까?</p>
+      <div class="qcard">
+        <div class="qlabel">오늘의 질문</div>
+        <div class="qtext">관 속에 생기는 소리의 <b class="hb">파장</b>은<br>관의 길이와 어떤 관계가 있을까?</div>
+      </div>
+      <div class="goal"><b>목표 1</b> 파동, 횡파·종파, 진폭·파장·진동수를 설명한다.<br><b>목표 2</b> 관 길이 → 파장 → 진동수 → 소리 높낮이를 연결한다.</div>
+      <div class="row" style="gap:14px;margin-top:18px;align-items:center">
+        <button class="btn" id="listen0">♪ 낮은 솔 → 높은 솔 들어 보기</button>
+        <span class="note">관을 클릭해도 소리가 나요</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1 파동이란 -->
+<section class="scene" id="s1">
+  <h2>1. 파동이란? 줄을 흔들어 보자</h2>
+  <div class="card" style="height:290px;position:relative"><canvas id="c1"></canvas>
+    <div style="position:absolute;right:20px;top:16px;display:flex;gap:10px">
+      <button class="btn sm" id="pulse1">한 번 흔들기</button>
+      <button class="btn sm" id="cont1">계속 흔들기</button>
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px">
+    <div class="card pad" style="width:740px;height:342px" id="txt1">
+      <div class="ttl">관찰하기</div>
+      <div class="body">① '한 번 흔들기'를 누르고 <b class="hp">분홍 점</b>을 지켜보세요.<br>② 분홍 점은 파동을 따라 오른쪽으로 갈까요?</div>
+    </div>
+    <div class="card pad" style="flex:1;height:342px" id="quiz1"></div>
+  </div>
+</section>
+
+<!-- 2 횡파와 종파 -->
+<section class="scene" id="s2">
+  <h2>2. 횡파와 종파: 소리는 어떤 파동일까?</h2>
+  <div class="card" style="height:276px"><canvas id="c2"></canvas></div>
+  <div class="row" style="margin-top:16px">
+    <div class="card pad" style="width:840px;height:356px" id="txt2">
+      <div class="ttl">관찰하기</div>
+      <div class="body">두 파동 모두 <b>오른쪽</b>으로 나아가요.<br>그런데 <b class="hp">분홍 표시</b>는 각각 어느 방향으로 떨리고 있나요?</div>
+    </div>
+    <div class="card pad" style="flex:1;height:356px;padding:16px 22px" id="quiz2"></div>
+  </div>
+</section>
+
+<!-- 3 파동의 요소 -->
+<section class="scene" id="s3">
+  <h2>3. 파동의 요소: 마루, 골, 진폭, 파장</h2>
+  <div class="row">
+    <div class="card" style="width:940px;height:630px"><canvas id="c3"></canvas></div>
+    <div class="col" style="flex:1;gap:14px">
+      <div id="s3a" class="col" style="gap:14px">
+        <div class="card pad" style="padding:12px 22px">
+          <div class="def"><b class="hl">마루·골</b> 가장 높은 곳 · 가장 낮은 곳</div>
+          <div class="def"><b class="hl">진폭</b> 가운데(진동 중심)에서 마루까지 높이<br><span class="note">→ 진폭이 클수록 <b>큰 소리</b></span></div>
+          <div class="def"><b class="hl">파장</b> 마루에서 다음 마루까지 거리<br><span class="note">종파: 빽빽한 곳에서 다음 빽빽한 곳까지</span></div>
+          <div class="def"><b class="hl">진동수</b> 1초 동안 진동하는 횟수 (단위 Hz)</div>
+        </div>
+        <div class="card pad" style="padding:14px 22px;display:flex;flex-direction:column;gap:10px">
+          <div class="ctl"><span class="lab">진폭</span><button class="btn sm" id="a3m">−</button><span class="val" id="a3v">보통</span><button class="btn sm" id="a3p">+</button></div>
+          <div class="ctl"><span class="lab">파장</span><button class="btn sm" id="l3m">−</button><span class="val" id="l3v">50 cm</span><button class="btn sm" id="l3p">+</button></div>
+          <div class="row" style="gap:10px"><button class="btn sm" id="mv3">⏸ 멈추기</button><button class="btn sm pri" id="snd3" style="flex:1">♪ 이 파동의 소리 듣기</button></div>
+        </div>
+      </div>
+      <div id="s3b" class="col hidden" style="gap:14px">
+        <div class="card pad" style="padding:14px 20px" id="quiz3a"></div>
+        <div class="card pad" style="padding:14px 20px" id="quiz3b"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 파장과 진동수 -->
+<section class="scene" id="s4">
+  <h2>4. 파장이 짧으면 왜 높은 소리가 날까?</h2>
+  <div class="row">
+    <div class="card" style="width:960px;height:630px"><canvas id="c4"></canvas></div>
+    <div class="col" style="flex:1;min-width:0;gap:14px">
+      <div class="card pad" style="padding:16px 22px" id="txt4">
+        <div class="body" style="font-size:24px">세 파동은 모두 <b>같은 빠르기</b>로 달려요.<br>같은 시간 동안 <b class="hl">귀에 도착하는 마루</b>의 수를 비교해 보세요.</div>
+        <div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn sm" id="rst4">↺ 다시 세기</button>
+          <button class="btn sm" data-f="425">♪ 80 cm</button>
+          <button class="btn sm" data-f="850">♪ 40 cm</button>
+          <button class="btn sm" data-f="1700">♪ 20 cm</button>
+        </div>
+      </div>
+      <div class="card pad" style="padding:16px 22px" id="quiz4"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 관 속의 파동 -->
+<section class="scene" id="s5">
+  <h2>5. 관 속의 파동: 관이 좋아하는 파장 찾기</h2>
+  <div class="card" style="height:320px" data-wheel><canvas id="c5"></canvas></div>
+  <div class="row" style="margin-top:14px;gap:18px">
+    <div class="card pad" style="width:600px;height:296px;padding:14px 20px;display:flex;flex-direction:column;gap:10px">
+      <div class="tabs" id="tabs5"></div>
+      <div class="ctl" style="gap:8px"><span class="lab" style="width:auto">보내는 소리의 파장</span>
+        <button class="btn sm" data-d="-5">−5</button><button class="btn sm" data-d="-1">−1</button>
+        <span class="val big3" id="lam5" style="min-width:120px">30 cm</span>
+        <button class="btn sm" data-d="1">+1</button><button class="btn sm" data-d="5">+5</button></div>
+      <div class="ctl"><span class="lab" style="width:auto">울림 정도</span><div class="meter" style="flex:1"><i id="met5"></i></div></div>
+      <div class="row" style="gap:10px;align-items:center"><button class="btn sm pri" id="tone5">♪ 소리 켜기</button><span class="note" style="font-size:19px">휠·키보드 ↑↓로도 조절</span></div>
+    </div>
+    <div class="card pad" style="width:330px;height:296px;padding:14px 20px">
+      <div class="ttl">공명 기록</div>
+      <table id="rec5"></table>
+    </div>
+    <div class="card pad" style="flex:1;height:296px;padding:14px 20px" id="quiz5"></div>
+  </div>
+</section>
+
+<!-- 6 우리 팬플루트 -->
+<section class="scene" id="s6">
+  <h2>6. 우리 팬플루트의 파장과 진동수</h2>
+  <div class="row">
+    <div class="card" style="width:820px;height:630px"><svg id="fl6" width="820" height="630"></svg></div>
+    <div class="col" style="flex:1;gap:14px">
+      <div class="card pad" style="padding:14px 20px">
+        <div class="ttl">선택한 관: <span id="n6" class="hl">솔</span> <span class="note" style="font-size:18px">노란 모양 = 공기의 진동 크기 (입구 최대, 막힌 끝 0)</span></div>
+        <div class="kv">
+          <div><div class="k">공기 기둥 길이</div><div class="v" id="L6">10.8<small> cm</small></div></div>
+          <div><div class="k">파장 = 4 × 길이</div><div class="v hb" id="W6">43<small> cm</small></div></div>
+          <div><div class="k">진동수</div><div class="v hl" id="F6">784<small> Hz</small></div></div>
+        </div>
+      </div>
+      <div class="card pad" style="padding:14px 20px">
+        <div class="ttl">'작은 별' 연주 <span class="note" style="font-size:18px">관 클릭 · 숫자 키 1~8</span></div>
+        <div class="song" id="song6"></div>
+        <div class="row" style="gap:10px"><button class="btn sm" id="auto6">♪ 자동 연주</button><button class="btn sm" id="reset6">처음부터</button></div>
+      </div>
+      <div class="card pad" style="padding:14px 20px" id="quiz6"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 만들기 -->
+<section class="scene" id="s7">
+  <h2>7. 직접 만들고 재어 보기</h2>
+  <div class="row">
+    <div class="card" style="width:780px;height:630px;display:flex;align-items:center;justify-content:center"><svg id="mk7" width="760" height="610" viewBox="0 0 760 610"></svg></div>
+    <div class="col" style="flex:1;gap:14px">
+      <div class="card pad" style="padding:12px 16px">
+        <ol class="mk" id="mk7l">
+          <li><span class="n">1</span><span>도면의 음계표를 <b>8 cm</b> 길이로 오린다.</span></li>
+          <li><span class="n">2</span><span>음계표 확인: 솔·라·시·도·레·미·파·솔</span></li>
+          <li><span class="n">3</span><span>시험관을 긴 것부터 놓고, <b class="hl">부는 쪽(열린 입구)</b>을 한 줄로 맞춘다.</span></li>
+          <li><span class="n">4</span><span>양면테이프를 가로로 <b>두 줄</b> 붙인다.</span></li>
+          <li><span class="n">5</span><span>음계표를 붙인다. 가장 긴 관 = 낮은 솔</span></li>
+          <li><span class="n">6</span><span>입구 모서리에 입김을 가늘게 '후—' 분다.</span></li>
+        </ol>
+      </div>
+      <div class="card pad" style="padding:14px 20px;flex:1">
+        <div class="ttl" style="margin-bottom:6px">내 관 재어 보기 <span class="note" style="font-size:18px">입구 ~ 막힌 바닥까지 자로 재기</span></div>
+        <div class="pick8" id="pick7"></div>
+        <div class="ctl" style="margin-top:10px;gap:8px"><span class="lab" style="width:auto">잰 길이</span>
+          <button class="btn sm" data-d="-1">−1</button><button class="btn sm" data-d="-0.1">−0.1</button>
+          <span class="val big3" id="L7" style="min-width:130px">10.8 cm</span>
+          <button class="btn sm" data-d="0.1">+0.1</button><button class="btn sm" data-d="1">+1</button></div>
+        <div style="font-size:23px;line-height:1.5;margin-top:6px">
+          파장 = 4 × <span id="L7b">10.8</span> = <b class="hb" id="W7">43.4 cm</b><br>
+          진동수 = 340 ÷ <span id="W7b">0.434</span> m ≈ <b class="hl" id="F7">784 Hz</b> <span class="note" id="N7">(솔에 가까움)</span>
+        </div>
+        <button class="btn sm pri" id="snd7" style="margin-top:6px">♪ 계산한 소리 듣고 실제와 비교</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 정리 -->
+<section class="scene" id="s8">
+  <h2>8. 정리하기: 빈칸을 채워 보자</h2>
+  <div class="card pad" style="padding:20px 32px">
+    <div class="sent">
+      소리는 공기 알갱이가 진행 방향과 나란하게 진동하는 <span class="blank" data-k="0"></span>이다.<br>
+      마루에서 다음 마루까지의 거리를 <span class="blank" data-k="1"></span>이라고 한다.<br>
+      한쪽이 막힌 관은 관 길이가 파장의 <span class="blank" data-k="2"></span>일 때 크게 울린다(공명).<br>
+      관이 짧을수록 파장이 <span class="blank" data-k="3"></span> 진동수가 <span class="blank" data-k="4"></span> <span class="blank" data-k="5"></span> 소리가 난다.
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px;gap:24px;align-items:flex-start">
+    <div class="col" style="flex:1;gap:12px">
+      <div class="note">빈칸을 누른 뒤 낱말을 고르세요. (같은 낱말을 여러 번 쓸 수 있어요)</div>
+      <div class="bank" id="bank8"></div>
+      <div class="row" style="gap:12px;align-items:center"><button class="btn pri" id="check8">확인하기</button><button class="btn sm" id="clear8">지우기</button></div>
+    </div>
+    <div class="card pad" style="width:620px;min-height:230px" id="fb8"><div class="note">모든 빈칸을 채운 뒤 '확인하기'를 누르세요.</div></div>
+  </div>
+</section>
+
+<!-- 9 확인 -->
+<section class="scene" id="s9">
+  <h2>9. 확인 문제</h2>
+  <div class="row" style="justify-content:center">
+    <div class="card pad" style="width:1200px;min-height:560px;padding:28px 40px" id="box9"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <button class="btn" id="prevBtn">← 이전</button>
+  <div id="hint"></div>
+  <div id="pos">1 / 10</div>
+  <button class="btn pri" id="nextBtn">다음 →</button>
+</footer>
+
+<div id="modal" class="hidden">
+  <div class="mbox">
+    <div class="mt">교사용 잠금 해제</div>
+    <div class="note">비밀번호를 입력하면 문제를 풀지 않아도<br>모든 단계로 넘어갈 수 있어요.</div>
+    <div class="pw" id="pw"></div>
+    <div class="keys" id="keys"></div>
+    <div id="pwMsg"></div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ===== 설정 ===== */
+const TEACHER_PASSWORD = '1234';   // 교사용 비밀번호
+const V = 340;                      // 소리의 속력 (m/s, 약 15 °C) — 계산을 쉽게 하기 위한 값
+
+/* 키트 음계: 솔(G4) ~ 높은 솔(G5), 평균율 — 음계표 8 cm보다 가장 짧은 관이 조금 긴 키트 사진에 맞춘 가정 */
+const NOTES=[
+  {n:'솔',f:392.00},{n:'라',f:440.00},{n:'시',f:493.88},{n:'도',f:523.25},
+  {n:'레',f:587.33},{n:'미',f:659.26},{n:'파',f:698.46},{n:'솔',f:783.99,hi:true}
+];
+NOTES.forEach(o=>{o.W=V/o.f*100; o.L=o.W/4;});   // 파장, 공기 기둥 길이 (cm)
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const stage=$('#stage');
+let SCALE=1;
+
+/* ===== 오디오 ===== */
+let AC=null, master=null, noiseBuf=null;
+function ac(){
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      const comp=AC.createDynamicsCompressor();
+      master=AC.createGain(); master.gain.value=0.55;
+      master.connect(comp); comp.connect(AC.destination);
+    }catch(e){AC=null;}
+  }
+  if(AC && AC.state==='suspended') AC.resume();
+  return AC;
+}
+function playPipe(f,dur,vol){
+  const a=ac(); if(!a) return;
+  dur=dur||0.9; vol=vol==null?1:vol;
+  const t=a.currentTime+0.01, pk=0.32*vol;
+  const g=a.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(Math.max(pk,0.001),t+0.07);
+  g.gain.setValueAtTime(Math.max(pk,0.001),t+dur);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur+0.28);
+  g.connect(master);
+  const o1=a.createOscillator(); o1.type='sine'; o1.frequency.value=f;
+  const lfo=a.createOscillator(); lfo.frequency.value=5.2;
+  const lg=a.createGain(); lg.gain.value=f*0.0025; lfo.connect(lg); lg.connect(o1.frequency);
+  const o3=a.createOscillator(); o3.type='sine'; o3.frequency.value=f*3;
+  const g3=a.createGain(); g3.gain.value=0.08; o3.connect(g3); g3.connect(g);
+  o1.connect(g);
+  if(!noiseBuf){
+    noiseBuf=a.createBuffer(1,a.sampleRate*2,a.sampleRate);
+    const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  }
+  const ns=a.createBufferSource(); ns.buffer=noiseBuf; ns.loop=true;
+  const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=Math.min(f*2.5,9000); bp.Q.value=1.2;
+  const ng=a.createGain(); ng.gain.setValueAtTime(0.3,t); ng.gain.exponentialRampToValueAtTime(0.05,t+0.15);
+  ns.connect(bp); bp.connect(ng); ng.connect(g);
+  [o1,o3,lfo,ns].forEach(n=>{n.start(t); n.stop(t+dur+0.32);});
+}
+function playSine(f,dur,vol){
+  const a=ac(); if(!a) return;
+  const t=a.currentTime+0.01, o=a.createOscillator(), g=a.createGain();
+  o.frequency.value=f; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.3*vol,t+0.05);
+  g.gain.setValueAtTime(0.3*vol,t+dur); g.gain.exponentialRampToValueAtTime(0.0001,t+dur+0.2);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+0.25);
+}
+let tone=null;
+function toneStart(){
+  const a=ac(); if(!a||tone) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type='sine'; g.gain.value=0;
+  o.connect(g); g.connect(master); o.start(); tone={o,g};
+}
+function toneSet(f,v){ if(!tone) return; const t=AC.currentTime; tone.o.frequency.setTargetAtTime(f,t,0.02); tone.g.gain.setTargetAtTime(v,t,0.05); }
+function toneStop(){ if(!tone) return; const t=AC.currentTime, o=tone.o; tone.g.gain.setTargetAtTime(0,t,0.04); setTimeout(()=>{try{o.stop();}catch(e){}},300); tone=null; }
+function sfx(ok){
+  const a=ac(); if(!a) return;
+  const t=a.currentTime+0.01;
+  const seq= ok? [[784,0],[1047,0.11]] : [[220,0],[185,0.12]];
+  seq.forEach(([f,dt])=>{
+    const o=a.createOscillator(), g=a.createGain();
+    o.type= ok?'sine':'triangle'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t+dt); g.gain.exponentialRampToValueAtTime(ok?0.22:0.18,t+dt+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dt+0.22);
+    o.connect(g); g.connect(master); o.start(t+dt); o.stop(t+dt+0.25);
+  });
+}
+
+/* ===== 화면 맞춤 & 캔버스 ===== */
+const canvases=[];
+function mkCanvas(el,w,h){
+  el.style.width=w+'px'; el.style.height=h+'px'; el.style.display='block';
+  const o={el,w,h,ctx:el.getContext('2d')}; canvases.push(o); sizeCanvas(o); return o;
+}
+function sizeCanvas(o){
+  const r=Math.min(3,Math.max(1,SCALE*(window.devicePixelRatio||1)));
+  o.el.width=Math.round(o.w*r); o.el.height=Math.round(o.h*r);
+  o.ctx.setTransform(r,0,0,r,0,0);
+}
+function fit(){
+  SCALE=Math.min(window.innerWidth/1600, window.innerHeight/900);
+  stage.style.setProperty('--s',SCALE);
+  canvases.forEach(sizeCanvas);
+}
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','WenQuanYi Zen Hei',sans-serif";
+function txt(ctx,s,x,y,size,color,align,weight){
+  ctx.font=(weight||700)+' '+size+'px '+FONT; ctx.fillStyle=color||'#eef3fb';
+  ctx.textAlign=align||'left'; ctx.textBaseline='middle'; ctx.fillText(s,x,y);
+}
+function txtBg(ctx,s,x,y,size,color){
+  ctx.font='800 '+size+'px '+FONT; const w=ctx.measureText(s).width;
+  ctx.fillStyle='rgba(12,22,42,.88)'; rr(ctx,x-6,y-size*0.75,w+12,size*1.5,8); ctx.fill();
+  txt(ctx,s,x,y,size,color,'left',800);
+}
+function arrow(ctx,x1,y1,x2,y2,color,w,both){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w||3;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const head=(x,y,dx,dy)=>{const L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, s=12;
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-ux*s-uy*s*0.6,y-uy*s+ux*s*0.6); ctx.lineTo(x-ux*s+uy*s*0.6,y-uy*s-ux*s*0.6); ctx.closePath(); ctx.fill();};
+  head(x2,y2,x2-x1,y2-y1); if(both) head(x1,y1,x1-x2,y1-y2);
+}
+function dashLine(ctx,x1,y1,x2,y2,color,w){
+  ctx.save(); ctx.setLineDash([8,7]); ctx.strokeStyle=color; ctx.lineWidth=w||2;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
+}
+function badge(ctx,s,x,y){ // 원 숫자 표시
+  ctx.fillStyle='#ffd23f'; ctx.beginPath(); ctx.arc(x,y,17,0,Math.PI*2); ctx.fill();
+  txt(ctx,s,x,y+1,20,'#1b1b1b','center',900);
+}
+
+/* ===== SVG 팬플루트 (키트 모양: 입구 가지런, 막힌 쪽 빨간 마개) ===== */
+function buildFlute(svg,o){
+  const id=svg.id, NS='http://www.w3.org/2000/svg';
+  const W=8*o.tw+7*o.gap;
+  let h=`<defs>
+   <linearGradient id="${id}a" x1="0" x2="1"><stop offset="0" stop-color="#7fd3ff" stop-opacity=".10"/><stop offset=".5" stop-color="#7fd3ff" stop-opacity=".30"/><stop offset="1" stop-color="#7fd3ff" stop-opacity=".10"/></linearGradient>
+   <linearGradient id="${id}c" x1="0" x2="1"><stop offset="0" stop-color="#b81c28"/><stop offset=".4" stop-color="#ff4d5a"/><stop offset="1" stop-color="#a91824"/></linearGradient>
+  </defs>`;
+  NOTES.forEach((n,i)=>{
+    const x=o.x0+i*(o.tw+o.gap), L=n.L*o.pxcm, y0=o.y0, c=o.capH, cx=x+o.tw/2;
+    h+=`<g class="tube" data-i="${i}">
+      <rect x="${x-o.gap/2}" y="${y0-24}" width="${o.tw+o.gap}" height="${L+c+50}" fill="transparent"/>
+      <rect class="air" x="${x+2}" y="${y0}" width="${o.tw-4}" height="${L}" fill="url(#${id}a)"/>
+      <rect x="${x+7}" y="${y0}" width="4" height="${L-4}" fill="rgba(255,255,255,.16)"/>
+      <rect class="glass" x="${x}" y="${y0-8}" width="${o.tw}" height="${L+8+c*0.6}" rx="6" fill="none" stroke="rgba(215,232,255,.75)" stroke-width="2.5"/>
+      <rect x="${x-3}" y="${y0-10}" width="${o.tw+6}" height="5" rx="2" fill="rgba(225,238,255,.9)"/>
+      <rect x="${x-5}" y="${y0+L}" width="${o.tw+10}" height="${c}" rx="9" fill="url(#${id}c)"/>
+      <rect x="${x+4}" y="${y0+L+5}" width="6" height="${c-12}" rx="3" fill="rgba(255,255,255,.35)"/>
+      <path class="env" d="" fill="rgba(255,210,63,.28)" stroke="#ffd23f" stroke-width="2.5" style="display:none"/>
+      ${o.showLen?`<text class="len" x="${cx}" y="${y0+L+c+26}" text-anchor="middle">${n.L.toFixed(1)}</text>`:''}
+    </g>`;
+  });
+  // 음계표 (흰 종이 + 빨간 띠)
+  const lx=o.x0-6, ly=o.y0+o.labelY, lw=W+12, lh=o.labelH;
+  h+=`<g pointer-events="none"><rect x="${lx}" y="${ly}" width="${lw}" height="${lh}" fill="#f3f4f1" opacity=".93" rx="3"/>
+    <rect x="${lx}" y="${ly}" width="${lw}" height="${lh*0.18}" fill="#d7262f"/>`;
+  NOTES.forEach((n,i)=>{
+    const x=o.x0+i*(o.tw+o.gap), cx=x+o.tw/2;
+    if(i>0) h+=`<line x1="${x-o.gap/2}" y1="${ly+lh*0.18}" x2="${x-o.gap/2}" y2="${ly+lh}" stroke="#222" stroke-width="2"/>`;
+    h+=`<text x="${cx}" y="${ly+lh*0.42}" text-anchor="middle" dominant-baseline="central" font-size="${o.fs}" font-weight="800" fill="#222">${n.n}</text>`;
+    if(n.hi) h+=`<circle cx="${cx}" cy="${ly+lh*0.42-o.fs*0.72}" r="3" fill="#222"/>`;
+  });
+  h+=`</g>`;
+  if(o.extra) h+=o.extra;
+  svg.innerHTML=h;
+  const tubes=[...svg.querySelectorAll('.tube')];
+  tubes.forEach(t=>t.addEventListener('pointerdown',e=>{e.preventDefault(); o.onPlay(+t.dataset.i);}));
+  return tubes;
+}
+function flash(tubes,i){
+  const t=tubes[i]; if(!t) return;
+  t.classList.add('on'); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('on'),380);
+}
+
+/* ===== 퀴즈 ===== */
+function makeQuiz(el,o){
+  el.innerHTML=''; el.classList.add('quiz');
+  const st={done:false};
+  const q=document.createElement('div'); q.className='q'; q.innerHTML=o.q; el.appendChild(q);
+  const og=document.createElement('div'); og.className='opts'; og.style.gridTemplateColumns=`repeat(${o.cols||2},1fr)`; el.appendChild(og);
+  const fb=document.createElement('div'); fb.className='fb'; el.appendChild(fb);
+  if(o.compact) el.classList.add('compact');
+  o.opts.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='opt';
+    b.innerHTML=`<span class="ol">${i+1}</span><span>${t}</span>`;
+    b.addEventListener('click',()=>{
+      if(st.done||b.classList.contains('wrong')) return;
+      if(i===o.ans){
+        st.done=true; b.classList.add('right'); og.classList.add('done');
+        fb.className='fb ok'; fb.innerHTML='<span class="lb">정답!</span>'+o.explain; sfx(true);
+        o.onOK&&o.onOK(); $('#hint').classList.remove('warn'); updateNav();
+      }else{
+        b.classList.add('wrong'); fb.className='fb hint';
+        fb.innerHTML='<span class="lb">힌트</span>'+((o.hints&&o.hints[i])||'다시 생각해 보세요.'); sfx(false);
+      }
+    });
+    og.appendChild(b);
+  });
+  return st;
+}
+
+/* ===== 0. 도입 ===== */
+const tubes0=buildFlute($('#fl0'),{x0:46,y0:60,tw:50,gap:22,pxcm:21,capH:36,labelY:10,labelH:8*21,fs:24,
+  onPlay:i=>{playPipe(NOTES[i].f,0.7); flash(tubes0,i);}});
+$('#listen0').addEventListener('click',()=>{
+  playPipe(NOTES[0].f,0.8); flash(tubes0,0);
+  setTimeout(()=>{playPipe(NOTES[7].f,0.8); flash(tubes0,7);},1100);
+});
+
+/* ===== 1. 파동이란 (줄) ===== */
+const c1=mkCanvas($('#c1'),1512,290);
+const R1={T:0,pulses:[],cont:null,x0:120,x1:1440,y0:150,v:300,A:60,f:0.7,mark:760};
+function src1(t){
+  let y=0;
+  R1.pulses.forEach(tp=>{const u=t-tp; if(u>0&&u<0.55) y+=R1.A*Math.sin(Math.PI*u/0.55);});
+  const c=R1.cont;
+  if(c && t>=c.start && (c.stop==null || t<c.stop)) y+=R1.A*0.8*Math.sin(2*Math.PI*R1.f*(t-c.start));
+  return y;
+}
+$('#pulse1').addEventListener('click',()=>{R1.pulses.push(R1.T); R1.pulses=R1.pulses.filter(tp=>R1.T-tp<8);});
+$('#cont1').addEventListener('click',e=>{
+  const b=e.currentTarget;
+  if(R1.cont && R1.cont.stop==null){ const c=R1.cont; c.stop=c.start+Math.ceil((R1.T-c.start)*R1.f)/R1.f; b.textContent='계속 흔들기'; b.classList.remove('on'); }
+  else { R1.cont={start:R1.T,stop:null}; b.textContent='■ 멈추기'; b.classList.add('on'); }
+});
+function frame1(dt){
+  R1.T+=dt;
+  const ctx=c1.ctx, W=1512, H=290, {x0,x1,y0,v}=R1, T=R1.T;
+  ctx.clearRect(0,0,W,H);
+  dashLine(ctx,x0,y0,x1,y0,'rgba(160,190,240,.25)',1.5);
+  // 줄
+  ctx.strokeStyle='#e8eef8'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath();
+  for(let x=x0;x<=x1;x+=6){ const y=y0-src1(T-(x-x0)/v); x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.stroke();
+  // 손
+  const hy=y0-src1(T);
+  ctx.fillStyle='#f2c59b'; rr(ctx,x0-62,hy-26,52,52,18); ctx.fill();
+  txt(ctx,'손',x0-36,hy+1,22,'#3a2410','center',900);
+  // 분홍 점
+  const my=y0-src1(T-(R1.mark-x0)/v);
+  dashLine(ctx,R1.mark,y0-R1.A-30,R1.mark,y0+R1.A+30,'rgba(255,138,194,.55)',2);
+  ctx.fillStyle='#ff8ac2'; ctx.beginPath(); ctx.arc(R1.mark,my,13,0,Math.PI*2); ctx.fill();
+  txt(ctx,'분홍 점',R1.mark,y0+R1.A+52,20,'#ff8ac2','center');
+  arrow(ctx,560,40,800,40,'#ffd23f',4);
+  txt(ctx,'파동이 나아가는 방향',545,40,20,'#ffd23f','right');
+  txt(ctx,'줄의 끝은 멀리 이어져 있다고 생각해요(반사 없음)',W-20,H-18,17,'#7d90b0','right',600);
+}
+let shown1=false;
+const quiz1=makeQuiz($('#quiz1'),{
+  q:'줄을 따라 파동이 지나갈 때 <b class="hp">분홍 점</b>은 어떻게 움직였나요?',
+  opts:['파동을 따라 오른쪽 끝까지 이동한다','제자리에서 위아래로 진동한다','전혀 움직이지 않는다'],cols:1,ans:1,
+  hints:{0:'분홍 점이 점선을 벗어나 오른쪽으로 가나요? 다시 흔들어 보세요.',2:'파동이 지나가는 순간 분홍 점을 자세히 보세요.'},
+  explain:'줄은 제자리에서 진동하고, 전달되는 것은 <b>에너지</b>!',
+  onOK:()=>{
+    $('#txt1').innerHTML=`<div class="ttl">알게 된 점</div>
+      <div class="def"><b class="hl">파동</b> 한 곳에서 생긴 진동이 주위로 퍼져 나가는 현상</div>
+      <div class="def"><b class="hl">매질</b> 파동을 전달하는 물질 (줄, 물, 공기 …)<br><span class="note">소리의 매질은 주로 <b class="hb">공기</b> → 공기가 없으면 소리가 전달되지 않아요.</span></div>
+      <div class="def">매질은 <b>제자리에서 진동</b>할 뿐, 이동하는 것은 <b class="hl">에너지</b></div>`;
+  }
+});
+
+/* ===== 2. 횡파와 종파 ===== */
+const c2=mkCanvas($("#c2"),1512,276);
+const R2={T:0,x0:250,x1:1460,lam:300,f:0.55};
+function frame2(dt){
+  R2.T+=dt;
+  const ctx=c2.ctx, W=1512, H=276, T=R2.T, {x0,x1,lam,f}=R2;
+  ctx.clearRect(0,0,W,H);
+  const ph=x=>2*Math.PI*(f*T-(x-x0)/lam);
+  // 위: 횡파 (줄)
+  const yA=82, A=36;
+  txt(ctx,'줄을 위아래로',20,yA-14,21,'#dbe6f7','left',800); txt(ctx,'흔들 때',20,yA+14,21,'#dbe6f7','left',800);
+  ctx.strokeStyle='#e8eef8'; ctx.lineWidth=5; ctx.beginPath();
+  for(let x=x0;x<=x1;x+=6){const y=yA-A*Math.sin(ph(x)); x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke();
+  const mx=760, myA=yA-A*Math.sin(ph(mx));
+  ctx.fillStyle='#ff8ac2'; ctx.beginPath(); ctx.arc(mx,myA,12,0,Math.PI*2); ctx.fill();
+  arrow(ctx,mx+44,yA-34,mx+44,yA+34,'#ff8ac2',3,true);
+  txtBg(ctx,'진동 방향',mx+62,yA,19,'#ff8ac2');
+  // 아래: 종파 (공기 알갱이)
+  const yB=212;
+  txt(ctx,'소리가 전달될 때',20,yB-14,21,'#dbe6f7','left',800); txt(ctx,'공기 알갱이',20,yB+14,21,'#7fd3ff','left',800);
+  const gap=16, B=11;
+  for(let x=x0;x<=x1;x+=gap){
+    const dx=B*Math.sin(ph(x)), red=Math.abs(x-mx)<1;
+    ctx.fillStyle= red?'#ff8ac2':'rgba(170,225,255,.9)';
+    for(let r=-2;r<=2;r++){ ctx.beginPath(); ctx.arc(x+dx,yB+r*16,red?6:4.2,0,Math.PI*2); ctx.fill(); }
+  }
+  // 밀·소 표시
+  const n0=Math.floor(f*T)+2;
+  for(let n=n0;n>n0-8;n--){
+    const xc=x0+lam*(f*T-n);
+    if(xc>x0+20&&xc<x1-20) txt(ctx,'빽빽',xc,yB-58,18,'#ffd23f','center');
+    const xs=xc+lam/2;
+    if(xs>x0+20&&xs<x1-20) txt(ctx,'듬성',xs,yB-58,18,'#9db0cf','center');
+  }
+  arrow(ctx,mx-30,yB+52,mx+30,yB+52,'#ff8ac2',3,true);
+  txtBg(ctx,'진동 방향',mx+44,yB+52,19,'#ff8ac2');
+  arrow(ctx,1180,18,1400,18,'#ffd23f',4);
+  txt(ctx,'두 파동 모두 진행 방향 →',1170,18,19,'#ffd23f','right');
+}
+const quiz2=makeQuiz($('#quiz2'),{
+  q:'소리가 전달될 때 공기 알갱이는 진행 방향과 비교해 어떻게 진동할까?',
+  opts:['나란하게 (앞뒤로)','수직으로 (위아래로)','진동 없이 날아간다'],cols:1,ans:0,
+  hints:{1:'그건 위쪽 줄의 모습이에요. 아래쪽 공기 알갱이의 분홍 표시를 보세요.',2:'1번 화면에서 매질은 제자리에서 진동했어요.'},
+  explain:'진동 방향 ∥ 진행 방향 = <b>종파</b>. 소리는 종파!',
+  onOK:()=>{
+    $('#txt2').innerHTML=`<div class="cmp">
+      <div><div class="h">횡파</div>진동 방향 <b>⊥</b> 진행 방향<br><span class="note">예) 위아래로 흔든 줄, 지진파의 S파</span></div>
+      <div><div class="h hb">종파</div>진동 방향 <b>∥</b> 진행 방향<br><span class="note">예) <b class="hl">소리</b>, 앞뒤로 밀고 당긴 용수철, 지진파의 P파</span></div></div>
+      <div class="note" style="margin-top:12px">종파에서는 공기가 <b class="hl">빽빽한 곳</b>과 <b>듬성한 곳</b>이 번갈아 생기며 나아가요.</div>`;
+  }
+});
+
+/* ===== 3. 파동의 요소 ===== */
+const c3=mkCanvas($('#c3'),940,630);
+const AMP=[{n:'작게',a:35},{n:'보통',a:65},{n:'크게',a:95}];
+const R3={T:0,ai:1,lam:50,move:true,ph:0,pxcm:6,y0:225,xL:40,xR:900};
+function setA3(d){R3.ai=Math.max(0,Math.min(2,R3.ai+d)); $('#a3v').textContent=AMP[R3.ai].n;}
+function setL3(d){R3.lam=Math.max(20,Math.min(70,R3.lam+d)); $('#l3v').textContent=R3.lam+' cm';}
+$('#a3m').addEventListener('click',()=>setA3(-1)); $('#a3p').addEventListener('click',()=>setA3(1));
+$('#l3m').addEventListener('click',()=>setL3(-5)); $('#l3p').addEventListener('click',()=>setL3(5));
+$('#mv3').addEventListener('click',e=>{R3.move=!R3.move; e.currentTarget.textContent=R3.move?'⏸ 멈추기':'▶ 움직이기';});
+$('#snd3').addEventListener('click',()=>playSine(V/(R3.lam/100),0.9,[0.25,0.6,1][R3.ai]));
+function frame3(dt){
+  const ctx=c3.ctx, W=940, H=630, quizMode=sub[3]===1;
+  if(R3.move && !quizMode) R3.ph+=dt*70;
+  const lam = quizMode? 50*R3.pxcm : R3.lam*R3.pxcm;
+  const A = quizMode? 75 : AMP[R3.ai].a;
+  const off = quizMode? 0 : R3.ph;   // 진행 거리(px)
+  const {y0,xL,xR}=R3, k=2*Math.PI/lam;
+  // 마루 위치: sin(k(x-off-s))=1 → 기준 이동 s 를 두어 퀴즈 모드에서 첫 마루=170
+  const s = quizMode? 170-lam/4 : 0;
+  const Y=x=>y0-A*Math.sin(k*(x-off-s));
+  ctx.clearRect(0,0,W,H);
+  txt(ctx,'공기의 빽빽한 정도를 그래프로 나타낸 모습',xL,26,19,'#9db0cf','left',600);
+  // 자 눈금
+  ctx.strokeStyle='rgba(160,190,240,.18)'; ctx.lineWidth=1;
+  for(let cm=0;cm<=140;cm+=10){const x=xL+cm*R3.pxcm; ctx.beginPath(); ctx.moveTo(x,y0-120); ctx.lineTo(x,y0+120); ctx.stroke();
+    txt(ctx,cm+'',x,y0+138,15,'#5f739a','center',600);}
+  txt(ctx,'cm',xL+142*R3.pxcm,y0+138,15,'#5f739a','left',600);
+  dashLine(ctx,xL,y0,xR,y0,'rgba(200,220,255,.4)',1.5);
+  // 파동
+  ctx.strokeStyle='#ffd23f'; ctx.lineWidth=4; ctx.beginPath();
+  for(let x=xL;x<=xR;x+=3){const y=Y(x); x===xL?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke();
+  // 첫 마루
+  let c1x=(off+s+lam/4); c1x=c1x-Math.floor((c1x-(xL+30))/lam)*lam;
+  if(!quizMode){
+    const cA=c1x, cB=cA+lam, tr=cA+lam/2;
+    txtBg(ctx,'마루',cA+14,y0-A-6,21,'#fff');
+    if(tr<xR) txt(ctx,'골',tr,y0+A+22,21,'#fff','center',800);
+    arrow(ctx,cA-26,y0,cA-26,y0-A,'#7fd3ff',3,true);
+    txtBg(ctx,'진폭',cA-84,y0-A/2,20,'#7fd3ff');
+    if(cB<=xR+2){
+      dashLine(ctx,cA,y0-A,cA,y0-A-52,'rgba(255,138,194,.7)',2); dashLine(ctx,cB,y0-A,cB,y0-A-52,'rgba(255,138,194,.7)',2);
+      arrow(ctx,cA,y0-A-46,cB,y0-A-46,'#ff8ac2',3,true);
+      txt(ctx,'파장 '+R3.lam+' cm',(cA+cB)/2,y0-A-66,21,'#ff8ac2','center',800);
+    }
+  }else{
+    const cA=170, cB=cA+lam, tr=cA+lam/2;
+    dashLine(ctx,60,y0-A,xR,y0-A,'rgba(255,255,255,.18)',1); dashLine(ctx,60,y0+A,xR,y0+A,'rgba(255,255,255,.18)',1);
+    // ① 마루→마루 (가로)
+    arrow(ctx,cA,y0-A-34,cB,y0-A-34,'#ffd23f',3,true); badge(ctx,'1',(cA+cB)/2,y0-A-62);
+    // ② 중심→마루 (세로)
+    arrow(ctx,cB,y0,cB,y0-A,'#ffd23f',3,true); badge(ctx,'2',cB+30,y0-A/2-24);
+    dashLine(ctx,cA,y0-A,cA,y0-A-40,'rgba(255,210,63,.6)',2); dashLine(ctx,cB,y0-A,cB,y0-A-40,'rgba(255,210,63,.6)',2);
+    // ③ 마루→골 (세로)
+    arrow(ctx,90,y0-A,90,y0+A,'#ffd23f',3,true); badge(ctx,'3',62,y0);
+    // ④ 마루→옆 골 (가로)
+    arrow(ctx,cA,y0+A+26,tr,y0+A+26,'#ffd23f',3,true); badge(ctx,'4',cA-26,y0+A+26);
+  }
+  // 공기 알갱이 줄 (종파): 그래프의 마루 = 빽빽한 곳
+  const yP=520, a=0.75/k*([0.5,0.75,1][quizMode?1:R3.ai]);
+  txt(ctx,'실제 공기 알갱이 모습',xL,yP-78,19,'#9db0cf','left',600);
+  for(let x=xL+4;x<=xR;x+=13){
+    const dx=a*Math.cos(k*(x-off-s));
+    const xx=x+dx; if(xx<xL||xx>xR) continue;
+    ctx.fillStyle='rgba(170,225,255,.9)';
+    for(let r=-2;r<=2;r++){ctx.beginPath(); ctx.arc(xx,yP+r*14,3.8,0,Math.PI*2); ctx.fill();}
+  }
+  if(!quizMode){
+    for(let cx=c1x;cx<xR;cx+=lam){ dashLine(ctx,cx,Y(cx)+8,cx,yP-40,'rgba(255,210,63,.35)',1.5); txt(ctx,'빽빽',cx,yP-52,17,'#ffd23f','center'); }
+  }
+}
+function step3(){
+  const s=sub[3];
+  $('#s3a').classList.toggle('hidden',s!==0);
+  $('#s3b').classList.toggle('hidden',s!==1);
+}
+const quiz3a=makeQuiz($('#quiz3a'),{
+  q:'왼쪽 그림에서 <b class="hl">파장</b>을 나타낸 것은?',opts:['①','②','③','④'],cols:4,ans:0,compact:true,
+  hints:{1:'②는 가운데에서 마루까지의 높이예요.',2:'③은 마루에서 골까지의 높이예요.',3:'④는 마루에서 바로 옆 골까지 — 파장의 절반이에요.'},
+  explain:'마루에서 다음 마루까지의 거리 = 파장'});
+const quiz3b=makeQuiz($('#quiz3b'),{
+  q:'왼쪽 그림에서 <b class="hl">진폭</b>을 나타낸 것은?',opts:['①','②','③','④'],cols:4,ans:1,compact:true,
+  hints:{0:'①은 가로 방향 거리예요. 진폭은 높이!',2:'③은 진폭의 2배예요. 진동 중심(가운데)에서 재야 해요.',3:'④는 가로 방향 거리예요.'},
+  explain:'진동 중심에서 마루까지의 높이 = 진폭 (③은 진폭의 2배)'});
+
+/* ===== 4. 파장과 진동수 ===== */
+const c4=mkCanvas($('#c4'),960,630);
+const R4={t:0,v:110,ear:760,lanes:[{cm:80,px:320,y:130},{cm:40,px:160,y:320},{cm:20,px:80,y:510}]};
+$('#rst4').addEventListener('click',()=>{R4.t=0;});
+$$('#txt4 [data-f]').forEach(b=>b.addEventListener('click',()=>playSine(+b.dataset.f,0.8,0.8)));
+function frame4(dt){
+  R4.t+=dt; if(R4.t>20) R4.t=0;
+  const ctx=c4.ctx, W=960, H=630, {v,ear}=R4, t=R4.t, A=48;
+  ctx.clearRect(0,0,W,H);
+  txt(ctx,'느린 화면 시간: '+t.toFixed(1)+'초',24,26,20,'#9db0cf','left',700);
+  // 귀 선
+  dashLine(ctx,ear,50,ear,H-20,'rgba(255,210,63,.7)',2.5);
+  txt(ctx,'귀',ear,34,22,'#ffd23f','center',900);
+  R4.lanes.forEach(L=>{
+    const lam=L.px, k=2*Math.PI/lam, y0=L.y;
+    txt(ctx,'파장 '+L.cm+' cm',24,y0-A-28,22,'#fff','left',800);
+    ctx.strokeStyle='rgba(127,211,255,.9)'; ctx.lineWidth=3.5; ctx.beginPath();
+    let started=false;
+    for(let x=30;x<=ear+56;x+=3){
+      if(x>v*t+30+lam*0.0 && false) break;
+      const y=y0-A*Math.sin(k*(x-v*t)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // 마루 표시 및 도착 수
+    const base=lam/4; // sin(k(x-vt))=1 → x = vt + lam/4 + n·lam
+    for(let n=-12;n<12;n++){const xc=v*t+base+n*lam; if(xc>30&&xc<ear+56){ctx.fillStyle= xc<ear?'#ffd23f':'rgba(255,210,63,.35)'; ctx.beginPath(); ctx.arc(xc,y0-A,6,0,Math.PI*2); ctx.fill();}}
+    const cnt=Math.floor((v*t+base-ear)/lam)-Math.floor((base-ear)/lam);
+    txt(ctx,'도착한',ear+132,y0-30,19,'#9db0cf','center',700);
+    txt(ctx,'마루',ear+132,y0-6,19,'#9db0cf','center',700);
+    txt(ctx,cnt+'개',ear+132,y0+32,38,'#ffd23f','center',900);
+  });
+  txt(ctx,'※ 실제 소리는 1초에 수백~수천 개가 도착해요',24,H-16,17,'#7d90b0','left',600);
+}
+const quiz4=makeQuiz($('#quiz4'),{
+  q:'파장이 <b>절반</b>이 되면, 1초 동안 귀에 도착하는 마루의 수(진동수)는?',
+  opts:['절반','같다','2배'],cols:3,ans:2,compact:true,
+  hints:{0:'파장 20 cm와 40 cm 줄의 도착 수를 비교해 보세요.',1:'세 줄의 도착 수가 같은가요?'},
+  explain:'파장이 짧을수록 진동수가 커져 <b>높은 소리</b>!',
+  onOK:()=>{
+    $('#quiz4').insertAdjacentHTML('beforeend',`<div class="formula" style="margin-top:12px;font-size:25px">진동수 = 소리의 속력 ÷ 파장<br><span style="font-size:22px;font-weight:700">예) 340 m/s ÷ 0.4 m = <span class="hl">850 Hz</span></span></div>`);
+  }
+});
+
+/* ===== 5. 관 속의 파동 (공명) ===== */
+const c5=mkCanvas($('#c5'),1512,320);
+const TUBES5=[{n:'관 A',L:15},{n:'관 B',L:10},{n:'관 C',L:5}];
+const R5={ti:0,lam:30,T:0,on:false,found:[false,false,false],px:12,cap:1260,y0:150};
+function lamMin(){return 2*TUBES5[R5.ti].L+2;}
+function strength5(){
+  const f0=V/(4*TUBES5[R5.ti].L/100), f=V/(R5.lam/100), Q=10, d=Q*(f/f0-f0/f);
+  return 1/(1+d*d);
+}
+function setLam5(v){
+  R5.lam=Math.max(lamMin(),Math.min(70,Math.round(v)));
+  $('#lam5').textContent=R5.lam+' cm';
+  const s=strength5(); $('#met5').style.width=(s*100).toFixed(0)+'%';
+  if(R5.on) toneSet(V/(R5.lam/100),0.04+0.3*s);
+  if(R5.lam===4*TUBES5[R5.ti].L && !R5.found[R5.ti]){ R5.found[R5.ti]=true; sfx(true); renderTabs5(); renderRec5(); }
+}
+function renderTabs5(){
+  $('#tabs5').innerHTML=TUBES5.map((t,i)=>`<button class="${i===R5.ti?'on':''} ${R5.found[i]?'ok':''}" data-i="${i}">${t.n} (${t.L} cm)</button>`).join('');
+  $$('#tabs5 button').forEach(b=>b.addEventListener('click',()=>{R5.ti=+b.dataset.i; renderTabs5(); setLam5(R5.lam);}));
+}
+let quiz5=null;
+function renderRec5(){
+  let h='<tr><th>관</th><th>관 길이</th><th>공명 파장</th></tr>';
+  TUBES5.forEach((t,i)=>{h+=`<tr><td>${t.n.slice(-1)}</td><td>${t.L} cm</td><td>${R5.found[i]?'<span class="hl">'+4*t.L+' cm</span>':'<span style="color:#4b5d80">?</span>'}</td></tr>`;});
+  $('#rec5').innerHTML=h;
+  const n=R5.found.filter(Boolean).length;
+  if(n<3 && !quiz5){
+    $('#quiz5').innerHTML=`<div class="ttl">탐구 방법</div><div class="body" style="font-size:23px">① 관을 고르고 '소리 켜기'<br>② 파장을 바꾸며 <b class="hl">울림이 가장 큰</b> 파장 찾기<br>③ 관 3개 모두 찾기 (${n}/3)</div>`;
+  }
+  if(n===3 && !quiz5){
+    quiz5=makeQuiz($('#quiz5'),{
+      q:'기록표를 보면, 공명하는 소리의 파장은 관 길이의 몇 배일까?',
+      opts:['2배','4배','1/4배','같다'],cols:4,ans:1,compact:true,
+      hints:{0:'15 cm × 2 = 30 cm. 기록은 60 cm였어요.',2:'파장이 관보다 길었나요, 짧았나요?',3:'15 cm와 60 cm는 같지 않아요.'},
+      explain:'파장 = 4 × 관 길이. 관 속에는 <b>파장의 1/4</b>만 들어가요.'});
+    updateNav();
+  }
+}
+$$('#s5 [data-d]').forEach(b=>b.addEventListener('click',()=>setLam5(R5.lam+(+b.dataset.d))));
+$('#tone5').addEventListener('click',e=>{
+  R5.on=!R5.on; const b=e.currentTarget;
+  if(R5.on){toneStart(); setLam5(R5.lam); b.textContent='■ 소리 끄기'; b.classList.add('on');}
+  else{toneStop(); b.textContent='♪ 소리 켜기'; b.classList.remove('on');}
+});
+c5.el.parentElement.addEventListener('wheel',e=>{e.preventDefault(); setLam5(R5.lam+(e.deltaY>0?-1:1));},{passive:false});
+function stop5(){ if(R5.on){R5.on=false; toneStop(); const b=$('#tone5'); b.textContent='♪ 소리 켜기'; b.classList.remove('on');} }
+function frame5(dt){
+  R5.T+=dt;
+  const ctx=c5.ctx, W=1512, H=320, {px,cap,y0}=R5, L=TUBES5[R5.ti].L, lam=R5.lam;
+  const s=strength5(), mouth=cap-L*px, res=lam===4*L, th=96, A=40;
+  ctx.clearRect(0,0,W,H);
+  // 관
+  const g=ctx.createLinearGradient(0,y0-th/2,0,y0+th/2);
+  g.addColorStop(0,'rgba(127,211,255,.10)'); g.addColorStop(.5,'rgba(127,211,255,'+(0.18+0.3*s)+')'); g.addColorStop(1,'rgba(127,211,255,.10)');
+  ctx.fillStyle=g; ctx.fillRect(mouth,y0-th/2,cap-mouth,th);
+  ctx.strokeStyle='rgba(215,232,255,.85)'; ctx.lineWidth=3; ctx.beginPath();
+  ctx.moveTo(mouth-6,y0-th/2); ctx.lineTo(cap,y0-th/2); ctx.moveTo(mouth-6,y0+th/2); ctx.lineTo(cap,y0+th/2); ctx.stroke();
+  const cg=ctx.createLinearGradient(0,y0-th/2,0,y0+th/2); cg.addColorStop(0,'#b81c28'); cg.addColorStop(.4,'#ff4d5a'); cg.addColorStop(1,'#a91824');
+  ctx.fillStyle=cg; rr(ctx,cap,y0-th/2-8,30,th+16,7); ctx.fill();
+  if(res){ctx.save(); ctx.shadowColor='#ffd23f'; ctx.shadowBlur=30; ctx.strokeStyle='rgba(255,210,63,.8)'; ctx.lineWidth=3; ctx.strokeRect(mouth-4,y0-th/2-4,cap-mouth+8,th+8); ctx.restore();}
+  // 공기 알갱이 (관 안)
+  const ph=R5.T*2*Math.PI*1.1, amp=R5.on? 9*s+1.2 : 0;
+  ctx.fillStyle='rgba(210,242,255,.85)';
+  for(let x=cap-8;x>mouth+4;x-=13){
+    const d=cap-x, dx=-amp*Math.sin(2*Math.PI*d/(lam*px))*Math.sin(ph);
+    for(let r=-2;r<=2;r++){ctx.beginPath(); ctx.arc(x+dx,y0+r*17,3.3,0,Math.PI*2); ctx.fill();}
+  }
+  // 파동(진동 크기): 막힌 끝 0, d=거리
+  const wy=d=>y0-A*Math.sin(2*Math.PI*d/(lam*px));
+  const xEnd=cap-lam*px;
+  ctx.save(); ctx.setLineDash([7,7]); ctx.strokeStyle='rgba(255,210,63,.55)'; ctx.lineWidth=3; ctx.beginPath();
+  for(let x=mouth;x>=xEnd;x-=3){const y=wy(cap-x); x===mouth?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke(); ctx.restore();
+  ctx.strokeStyle='#ffd23f'; ctx.lineWidth=4.5; ctx.beginPath();
+  for(let x=cap;x>=mouth;x-=3){const y=wy(cap-x); x===cap?ctx.moveTo(x,y):ctx.lineTo(x,y);} ctx.stroke();
+  // 입구의 진동 크기
+  const my=wy(L*px);
+  ctx.fillStyle= res?'#3ddc97':'#ff8ac2'; ctx.beginPath(); ctx.arc(mouth,my,9,0,Math.PI*2); ctx.fill();
+  // 라벨
+  txt(ctx,'막힌 끝',cap+15,y0+th/2+26,19,'#ff8a94','center');
+  txt(ctx,'(공기 못 움직임)',cap+15,y0+th/2+48,16,'#ff8a94','center',600);
+  if(cap-mouth<150) txt(ctx,'열린 입구',mouth-8,y0+th/2+26,19,'#9db0cf','right'); else txt(ctx,'열린 입구',mouth,y0+th/2+26,19,'#9db0cf','center');
+  // 파장 괄호
+  arrow(ctx,xEnd,H-42,cap,H-42,'#ff8ac2',3,true);
+  dashLine(ctx,xEnd,y0,xEnd,H-50,'rgba(255,138,194,.5)',1.5);
+  txt(ctx,(res?'파장 = 4 × 관 길이 = ':'보내는 소리의 파장 ')+lam+' cm',(xEnd+cap)/2,H-18,21,'#ff8ac2','center',800);
+  if(res){
+    arrow(ctx,mouth,y0-th/2-26,cap,y0-th/2-26,'#3ddc97',3,true);
+    txt(ctx,'관 길이 = 파장의 1/4',(mouth+cap)/2,y0-th/2-48,22,'#3ddc97','center',900);
+    ctx.font='900 22px '+FONT; const tw5=ctx.measureText('공명!  입구에서 가장 크게 진동').width; txtBg(ctx,'공명!  입구에서 가장 크게 진동',mouth-30-tw5,my-6,22,'#3ddc97');
+  }else{
+    txt(ctx,'입구의 진동',mouth-18,my,19,'#ff8ac2','right',700);
+  }
+  txt(ctx,'노란 선: 공기가 진동하는 크기 · 점선: 관 밖으로 이어 그린 가상의 파동',20,22,18,'#9db0cf','left',600);
+  txt(ctx,'※ 관은 파장의 3/4, 5/4 …일 때도 울리지만(더 높은 소리), 여기서는 가장 낮은 기본 소리만 다뤄요.',20,48,16,'#7d90b0','left',600);
+}
+
+/* ===== 6. 우리 팬플루트 ===== */
+const SONG=[0,0,4,4,5,5,4, 3,3,2,2,1,1,0];
+const BEAT=[1,1,1,1,1,1,2, 1,1,1,1,1,1,2];
+let songPos=0, autoTimers=[], sel6=0;
+const F6={x0:49,y0:60,tw:64,gap:30,pxcm:22,capH:36,labelY:10,labelH:8*22,fs:26};
+const tubes6=buildFlute($('#fl6'),Object.assign({},F6,{showLen:true,onPlay:i=>playNote6(i)}));
+(function(){
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',800); t.setAttribute('y',618); t.setAttribute('text-anchor','end');
+  t.setAttribute('font-size','17'); t.setAttribute('fill','#7d90b0');
+  t.textContent='관 아래 숫자: 공기 기둥 길이(cm, 소리 속력 340 m/s 기준 계산값)';
+  $('#fl6').appendChild(t);
+})();
+function select6(i){
+  sel6=i; const n=NOTES[i];
+  tubes6.forEach((t,k)=>{t.classList.toggle('sel',k===i); t.querySelector('.env').style.display= k===i?'':'none';});
+  // 진동 크기 곡선(막힌 끝 0 → 입구 최대)
+  const x=F6.x0+i*(F6.tw+F6.gap), cx=x+F6.tw/2, Lp=n.L*F6.pxcm, top=F6.y0+F6.labelY+F6.labelH+4, bot=F6.y0+Lp, w=F6.tw/2-6;
+  let dR='', dL='';
+  for(let y=bot;y>=top;y-=4){const e=Math.sin(Math.PI/2*(F6.y0+Lp-y)/Lp)*w; dR+=(y===bot?'M':'L')+(cx+e).toFixed(1)+' '+y; dL=' L'+(cx-e).toFixed(1)+' '+y+dL;}
+  tubes6[i].querySelector('.env').setAttribute('d',dR+dL+' Z');
+  $('#n6').textContent=(n.hi?'높은 ':(i===0?'낮은 ':''))+n.n;
+  $('#L6').innerHTML=n.L.toFixed(1)+'<small> cm</small>';
+  $('#W6').innerHTML=n.W.toFixed(1)+'<small> cm</small>';
+  $('#F6').innerHTML=Math.round(n.f)+'<small> Hz</small>';
+}
+function renderSong6(){
+  $('#song6').innerHTML=SONG.map((n,i)=>`<span class="${i<songPos?'done':i===songPos?'cur':''} ${i===6?'gap':''}">${NOTES[n].n}</span>`).join('');
+  tubes6.forEach((t,i)=>t.classList.toggle('next',songPos<SONG.length && i===SONG[songPos]));
+}
+function playNote6(i,dur){
+  playPipe(NOTES[i].f,dur||0.5); flash(tubes6,i); select6(i);
+  if(songPos<SONG.length && i===SONG[songPos]){songPos++; renderSong6();}
+}
+function stopAuto(){autoTimers.forEach(clearTimeout); autoTimers=[];}
+$('#auto6').addEventListener('click',()=>{
+  stopAuto(); ac(); let t=0; const q=450;
+  SONG.forEach((n,i)=>{autoTimers.push(setTimeout(()=>{playPipe(NOTES[n].f,BEAT[i]*q/1000*0.85); flash(tubes6,n); select6(n);},t)); t+=BEAT[i]*q;});
+});
+$('#reset6').addEventListener('click',()=>{stopAuto(); songPos=0; renderSong6();});
+renderSong6(); select6(0);
+const quiz6=makeQuiz($('#quiz6'),{
+  q:"'도' 관의 공기 기둥은 약 16.2 cm예요. 이 관에서 울리는 소리의 파장은?",
+  opts:['약 4 cm','약 16 cm','약 32 cm','약 65 cm'],cols:4,ans:3,compact:true,
+  hints:{0:'나누지 말고 곱해 보세요. 관 길이는 파장의 1/4이에요.',1:'관 길이 = 파장이 아니라, 관 길이 = 파장의 1/4!',2:'16.2 × 2가 아니라 × 몇일까요?'},
+  explain:'16.2 cm × 4 ≈ 65 cm → 340 ÷ 0.65 ≈ 523 Hz (도)'});
+
+/* ===== 7. 만들기 ===== */
+function mkSVG(step){
+  const svg=$('#mk7');
+  const tubeX=i=>150+i*62, top=150;
+  const lens=NOTES.map(n=>n.L*17);
+  let h='';
+  const label=(x,y,w,hh,cut)=>{
+    let s=`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="#f3f4f1" ${cut?'stroke="#ff8ac2" stroke-width="3" stroke-dasharray="10 7"':''}/>
+      <rect x="${x}" y="${y}" width="${w}" height="${hh*0.16}" fill="#d7262f"/>`;
+    const cw=w/8;
+    NOTES.forEach((n,i)=>{ if(i) s+=`<line x1="${x+i*cw}" y1="${y+hh*0.16}" x2="${x+i*cw}" y2="${y+hh}" stroke="#222" stroke-width="2"/>`;
+      s+=`<text x="${x+cw*(i+.5)}" y="${y+hh*0.34}" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="800" fill="#222">${n.n}</text>`; });
+    return s;
+  };
+  const tubes=()=>{let s='';NOTES.forEach((n,i)=>{const x=tubeX(i), L=lens[i];
+    s+=`<rect x="${x}" y="${top}" width="46" height="${L}" fill="rgba(127,211,255,.18)" stroke="rgba(215,232,255,.8)" stroke-width="2.5" rx="4"/>
+        <rect x="${x-3}" y="${top-6}" width="52" height="5" fill="rgba(225,238,255,.9)"/>
+        <rect x="${x-4}" y="${top+L-4}" width="54" height="30" rx="7" fill="#e8323f"/>`;});return s;};
+  if(step===0){
+    h+=`<rect x="70" y="40" width="620" height="520" fill="#e9ebe6" rx="6"/>
+      <text x="380" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#333">팬플루트 만들기 도면</text>`;
+    h+=label(150,120,460,300,true);
+    h+=`<line x1="640" y1="120" x2="640" y2="420" stroke="#d7262f" stroke-width="3"/><path d="M632 132 L640 118 L648 132 M632 408 L640 422 L648 408" stroke="#d7262f" stroke-width="3" fill="none"/>
+      <text x="652" y="270" font-size="28" font-weight="900" fill="#d7262f" dominant-baseline="central">8 cm</text>
+      <text x="380" y="470" text-anchor="middle" font-size="22" fill="#555">분홍 점선을 따라 오려요</text>
+      <g transform="translate(120 432) rotate(-20)"><circle cx="0" cy="0" r="12" fill="none" stroke="#555" stroke-width="4"/><circle cx="0" cy="30" r="12" fill="none" stroke="#555" stroke-width="4"/><path d="M10 6 L60 22 M10 24 L60 8" stroke="#555" stroke-width="5"/></g>`;
+  }else if(step===1){
+    h+=label(150,150,460,300,false);
+    h+=`<text x="380" y="500" text-anchor="middle" font-size="24" fill="#dbe6f7">왼쪽부터 낮은 솔 → 높은 솔 (8칸)</text>`;
+  }else if(step===2||step===3||step===4){
+    h+=tubes();
+    h+=`<line x1="120" y1="${top-16}" x2="650" y2="${top-16}" stroke="#ffd23f" stroke-width="3" stroke-dasharray="10 7"/>
+        <text x="380" y="${top-40}" text-anchor="middle" font-size="22" font-weight="800" fill="#ffd23f">부는 쪽(열린 입구)을 한 줄로!</text>
+        <text x="380" y="585" text-anchor="middle" font-size="20" fill="#9db0cf">빨간 마개 쪽 = 막힌 쪽 (막혀 있어야 소리가 나요)</text>`;
+    if(step>=3){
+      [top+34,top+112].forEach(y=>{h+=`<rect x="130" y="${y}" width="500" height="30" fill="#f5f5f5" opacity="${step===4?0.35:0.95}"/>`;
+        if(step===3) for(let x=150;x<620;x+=70) h+=`<text x="${x}" y="${y+21}" font-size="15" font-weight="800" fill="#d7262f">양면</text>`;});
+    }
+    if(step===4){ h+=label(130,top+14,500,8*17,false).replace(/fill="#f3f4f1"/,'fill="#f3f4f1" opacity=".95"'); }
+  }else{
+    // 부는 방법 옆모습
+    h+=`<rect x="330" y="200" width="70" height="330" fill="rgba(127,211,255,.18)" stroke="rgba(215,232,255,.85)" stroke-width="3" rx="5"/>
+      <rect x="324" y="514" width="82" height="36" rx="8" fill="#e8323f"/>
+      <path d="M170 150 Q240 130 300 170 Q250 200 170 190 Z" fill="#f2a1ae"/>
+      <path d="M160 205 Q230 225 318 200 L318 214 Q230 240 160 226 Z" fill="#e88595"/>
+      <path d="M300 182 Q350 186 392 200" stroke="#ffd23f" stroke-width="5" fill="none" stroke-dasharray="12 8"/>
+      <path d="M392 200 l-14 -10 l2 16 z" fill="#ffd23f"/>
+      <text x="420" y="190" font-size="22" font-weight="800" fill="#ffd23f">반대쪽 모서리로</text>
+      <text x="420" y="218" font-size="22" font-weight="800" fill="#ffd23f">가늘게 '후—'</text>
+      <text x="150" y="262" font-size="21" font-weight="700" fill="#f2a1ae">아랫입술을</text>
+      <text x="150" y="290" font-size="21" font-weight="700" fill="#f2a1ae">입구 가장자리에</text>
+      <text x="430" y="400" font-size="21" fill="#9db0cf">관 속 공기 기둥이</text>
+      <text x="430" y="428" font-size="21" fill="#9db0cf">진동해서 소리가 나요</text>
+      <text x="380" y="590" text-anchor="middle" font-size="20" fill="#9db0cf">너무 세게 불면 소리가 갈라지거나 갑자기 높아져요</text>`;
+  }
+  svg.innerHTML=h;
+}
+function step7(){
+  const s=sub[7];
+  $$('#mk7l li').forEach((li,i)=>{li.classList.toggle('cur',i===s); li.classList.toggle('done',i<s);});
+  mkSVG(s);
+}
+const M7={i:0,L:NOTES.map(n=>Math.round(n.L*10)/10)};
+$('#pick7').innerHTML=NOTES.map((n,i)=>`<button data-i="${i}">${n.n}${n.hi?'˙':''}</button>`).join('');
+$$('#pick7 button').forEach(b=>b.addEventListener('click',()=>{M7.i=+b.dataset.i; render7();}));
+$$('#s7 [data-d]').forEach(b=>b.addEventListener('click',()=>{M7.L[M7.i]=Math.max(2,Math.min(30,Math.round((M7.L[M7.i]+(+b.dataset.d))*10)/10)); render7();}));
+const NAMES=['도','도#','레','레#','미','파','파#','솔','솔#','라','라#','시'];
+function noteName(f){const m=Math.round(69+12*Math.log2(f/440)); return NAMES[((m%12)+12)%12];}
+function render7(){
+  $$('#pick7 button').forEach((b,i)=>b.classList.toggle('on',i===M7.i));
+  const L=M7.L[M7.i], W=4*L, f=V/(W/100);
+  $('#L7').textContent=L.toFixed(1)+' cm'; $('#L7b').textContent=L.toFixed(1);
+  $('#W7').textContent=W.toFixed(1)+' cm'; $('#W7b').textContent=(W/100).toFixed(3);
+  $('#F7').textContent=Math.round(f)+' Hz'; $('#N7').textContent='('+noteName(f)+'에 가까움)';
+}
+$('#snd7').addEventListener('click',()=>{const L=M7.L[M7.i]; playPipe(V/(4*L/100),0.9);});
+render7();
+
+/* ===== 8. 정리 ===== */
+const ANS8=['종파','파장','1/4','짧아지고','커져서','높은'];
+const BANK8=['종파','횡파','파장','진폭','1/4','1/2','짧아지고','길어지고','커져서','작아져서','높은','낮은'];
+const HINT8=[
+  '진동 방향과 진행 방향이 나란한 파동의 이름은?',
+  '마루와 마루 사이 거리 — 3번 장면을 떠올려 보세요.',
+  '관 길이 15 cm일 때 공명 파장은 60 cm였어요.',
+  '파장 = 4 × 관 길이. 관이 짧으면 파장은?',
+  '4번 장면: 파장이 짧을수록 귀에 도착하는 마루 수는?',
+  '진동수가 큰 소리는 높은 소리? 낮은 소리?'
+];
+const blanks=$$('#s8 .blank'), fill8=Array(6).fill(null), ok8=Array(6).fill(false);
+let selB=0, done8=false;
+function renderBlanks(){
+  blanks.forEach((b,i)=>{
+    b.innerHTML= fill8[i]? fill8[i] : `<sup>${i+1}</sup>`;
+    b.classList.toggle('sel',i===selB && !ok8[i] && !done8);
+    b.classList.toggle('right',ok8[i]); if(ok8[i]) b.classList.remove('wrong');
+  });
+}
+blanks.forEach((b,i)=>b.addEventListener('click',()=>{ if(ok8[i]||done8) return; selB=i; b.classList.remove('wrong'); renderBlanks(); }));
+$('#bank8').innerHTML=BANK8.map(w=>`<button class="tok">${w}</button>`).join('');
+$$('#bank8 .tok').forEach(t=>t.addEventListener('click',()=>{
+  if(done8) return;
+  if(selB==null||selB<0||ok8[selB]) selB=fill8.findIndex((v,i)=>!v&&!ok8[i]);
+  if(selB<0) selB=ok8.findIndex(v=>!v);
+  if(selB<0) return;
+  fill8[selB]=t.textContent; blanks[selB].classList.remove('wrong');
+  const nx=fill8.findIndex((v,i)=>!v&&!ok8[i]); if(nx>=0) selB=nx;
+  renderBlanks();
+}));
+$('#clear8').addEventListener('click',()=>{ if(done8) return; fill8.forEach((v,i)=>{if(!ok8[i]){fill8[i]=null; blanks[i].classList.remove('wrong');}}); selB=ok8.findIndex(v=>!v); renderBlanks(); });
+$('#check8').addEventListener('click',()=>{
+  if(done8) return;
+  if(fill8.some((v,i)=>!v&&!ok8[i])){ $('#fb8').innerHTML='<div class="note" style="color:var(--warn)">아직 비어 있는 빈칸이 있어요.</div>'; sfx(false); return; }
+  const wrong=[];
+  fill8.forEach((v,i)=>{ if(v===ANS8[i]) ok8[i]=true; else {wrong.push(i); blanks[i].classList.add('wrong');} });
+  if(!wrong.length){
+    done8=true; sfx(true);
+    $('#fb8').innerHTML=`<div class="ttl" style="color:var(--ok)">모두 맞았어요!</div>
+      <div style="font-size:25px;font-weight:800;line-height:1.7">관 짧다 → 파장(=4×관) 짧다<br>→ 진동수(=340÷파장) 크다 → <span class="hl">높은 소리</span></div>`;
+  }else{
+    sfx(false);
+    $('#fb8').innerHTML='<div class="ttl" style="color:var(--warn)">빨간 빈칸을 다시 생각해 봐요</div>'+
+      wrong.map(i=>`<div class="note" style="margin-bottom:6px"><b style="color:#fff">빈칸 ${i+1}</b> ${HINT8[i]}</div>`).join('');
+    selB=wrong[0];
+  }
+  renderBlanks(); updateNav();
+});
+renderBlanks();
+
+/* ===== 9. 확인 문제 ===== */
+const Q9=[
+  {q:'소리가 공기 중에서 전달될 때에 대한 설명으로 옳은 것은?',
+   opts:['공기 알갱이가 귀까지 날아온다','공기 알갱이는 제자리에서 진동하고, 에너지가 전달된다','소리는 공기가 없는 우주에서도 전달된다'],cols:1,ans:1,
+   hints:{0:'1번 장면의 분홍 점은 오른쪽 끝까지 갔나요?',2:'소리는 매질(공기 등)이 있어야 전달돼요.'},
+   explain:'매질은 제자리에서 진동하고, 파동은 <b>에너지</b>를 전달해요.'},
+  {q:'공기 기둥 길이가 10 cm인 관에서 가장 크게 울리는(기본) 소리의 파장은?',
+   opts:['2.5 cm','10 cm','20 cm','40 cm'],cols:4,ans:3,
+   hints:{0:'나누지 말고 곱해요. 관 길이 = 파장의 1/4',1:'관 길이와 파장은 같지 않았어요(5번 장면 기록표).',2:'10 cm × 2가 아니라 × 4!'},
+   explain:'파장 = 4 × 10 cm = <b>40 cm</b>'},
+  {q:'<span class="tag" style="margin:0 10px 0 0">도전</span>파장이 40 cm인 소리의 진동수는? (소리의 속력 340 m/s)',
+   opts:['85 Hz','850 Hz','1360 Hz','8500 Hz'],cols:4,ans:1,
+   hints:{0:'40 cm를 m로 바꾸면 0.4 m예요. 340 ÷ 0.4 = ?',2:'곱하지 말고 나눠요. 진동수 = 속력 ÷ 파장',3:'cm를 m로 바꿨나요? 40 cm = 0.4 m'},
+   explain:'340 m/s ÷ 0.4 m = <b>850 Hz</b>. 1초에 850번 진동해요.'},
+  {q:'시험관에 물을 조금 부어 공기 기둥을 짧게 했다. 이 관을 불면?',
+   opts:['파장이 짧아지고, 높은 소리가 난다','파장이 길어지고, 높은 소리가 난다','파장이 짧아지고, 낮은 소리가 난다','아무것도 변하지 않는다'],cols:1,ans:0,
+   hints:{1:'파장 = 4 × 공기 기둥 길이. 공기 기둥이 짧아지면?',2:'파장이 짧으면 진동수는 커져요.',3:'공기 기둥 길이가 바뀌면 파장도 바뀌어요.'},
+   explain:'공기 기둥↓ → 파장↓ → 진동수↑ → <b>높은 소리</b>'}
+];
+let qi9=0; const st9=[];
+function render9(){
+  const box=$('#box9');
+  if(qi9>=Q9.length){
+    box.innerHTML=`<div class="ttl" style="font-size:40px;color:var(--ok);margin-bottom:20px">모든 문제를 해결했어요!</div>
+      <div style="font-size:28px;line-height:1.75">
+      <div>① 파동은 매질의 진동이 퍼져 나가며 <b class="hl">에너지</b>를 전달한다. 소리는 <b class="hb">종파</b>.</div>
+      <div>② 파장 = 마루에서 다음 마루까지(빽빽한 곳에서 다음 빽빽한 곳까지)의 거리.</div>
+      <div>③ 한쪽이 막힌 관: <b>파장 = 4 × 공기 기둥 길이</b></div>
+      <div>④ 진동수 = 소리의 속력 ÷ 파장 → 관이 짧을수록 <b class="hl">높은 소리</b></div></div>
+      <div class="qcard" style="margin-top:22px"><div class="qlabel">더 생각해 보기</div>
+      <div style="font-size:25px;line-height:1.5">양쪽이 모두 열린 관(리코더 등)이라면 관 길이는 파장의 몇 분의 몇일까?</div></div>
+      <button class="btn" id="restart9">처음 화면으로</button>`;
+    $('#restart9').addEventListener('click',()=>show(0));
+    updateNav(); return;
+  }
+  box.innerHTML=`<div class="qn">문제 ${qi9+1} / ${Q9.length}</div><div id="q9"></div><div id="nx9" style="margin-top:18px"></div>`;
+  const s=makeQuiz($('#q9'),Object.assign({},Q9[qi9],{onOK:()=>{
+    $('#nx9').innerHTML=`<button class="btn pri">${qi9<Q9.length-1?'다음 문제 →':'정리 보기 →'}</button>`;
+    $('#nx9 button').addEventListener('click',()=>{qi9++; render9();});
+  }}));
+  $('#q9 .q').style.fontSize='33px';
+  $$('#q9 .opt').forEach(o=>o.style.fontSize='27px');
+  if(st9[qi9] && st9[qi9].done){ const b=$$('#q9 .opt')[Q9[qi9].ans]; b&&b.click(); }
+  st9[qi9]=s; updateNav();
+}
+
+/* ===== 진행 제어 ===== */
+let teacher=false;
+const SC=[
+  {name:'도입'},
+  {name:'파동',frame:frame1,gate:()=>quiz1.done,lock:'질문에 답하면 넘어갈 수 있어요.'},
+  {name:'횡파·종파',frame:frame2,gate:()=>quiz2.done,lock:'질문에 답하면 넘어갈 수 있어요.'},
+  {name:'파동의 요소',steps:2,step:step3,frame:frame3,gate:()=>quiz3a.done&&quiz3b.done,lock:'두 문제를 모두 맞히면 넘어갈 수 있어요.'},
+  {name:'파장·진동수',frame:frame4,gate:()=>quiz4.done,lock:'질문에 답하면 넘어갈 수 있어요.'},
+  {name:'관 속 파동',frame:frame5,gate:()=>quiz5&&quiz5.done,lock:'관 3개의 공명 파장을 찾고 질문에 답해 보세요.',leave:stop5,
+    enter:()=>{renderTabs5(); renderRec5(); setLam5(R5.lam);},
+    keys:e=>{ if(e.key==='ArrowUp'){setLam5(R5.lam+1); return true;} if(e.key==='ArrowDown'){setLam5(R5.lam-1); return true;} }},
+  {name:'팬플루트',gate:()=>quiz6.done,lock:'질문에 답하면 넘어갈 수 있어요.',leave:stopAuto,
+    keys:e=>{ const k=parseInt(e.key,10); if(k>=1&&k<=8){playNote6(k-1); return true;} }},
+  {name:'만들기',steps:6,step:step7},
+  {name:'정리',gate:()=>done8,lock:'빈칸을 모두 맞혀야 넘어갈 수 있어요.'},
+  {name:'확인',enter:()=>render9(),
+    onNext:()=>{
+      if(qi9>=Q9.length) return true;
+      if((st9[qi9]&&st9[qi9].done)||teacher){qi9++; render9(); return true;}
+      nudge('문제를 맞히면 다음 문제로 넘어가요.'); return true;
+    },
+    onPrev:()=>{ if(qi9>0){qi9--; render9(); return true;} return false; },
+    atEnd:()=>qi9>=Q9.length}
+];
+let cur=0; const sub=SC.map(()=>0);
+function passed(i){ const S=SC[i]; return teacher || !S.gate || S.gate(); }
+function canReach(i){ for(let j=0;j<i;j++){ if(!passed(j)) return false; } return true; }
+function show(i){
+  if(i<0||i>=SC.length) return;
+  const P=SC[cur]; P.leave&&P.leave();
+  cur=i;
+  $$('.scene').forEach((s,k)=>s.classList.toggle('on',k===i));
+  const S=SC[i]; S.step&&S.step(sub[i]); S.enter&&S.enter();
+  updateNav();
+}
+function nudge(msg){
+  const h=$('#hint'); h.textContent=msg; h.classList.add('warn');
+  const n=$('#nextBtn'); n.classList.remove('nudge'); void n.offsetWidth; n.classList.add('nudge');
+  clearTimeout(nudge.t); nudge.t=setTimeout(()=>{h.classList.remove('warn'); updateNav();},2600);
+}
+function next(){
+  const S=SC[cur];
+  if(S.onNext && S.onNext()) return;
+  if(S.steps && sub[cur]<S.steps-1){ sub[cur]++; S.step(sub[cur]); updateNav(); return; }
+  if(cur>=SC.length-1) return;
+  if(!passed(cur)){ nudge(S.lock||'문제를 해결하면 넘어갈 수 있어요.'); return; }
+  show(cur+1);
+}
+function prev(){
+  const S=SC[cur];
+  if(S.onPrev && S.onPrev()) return;
+  if(S.steps && sub[cur]>0){ sub[cur]--; S.step(sub[cur]); updateNav(); return; }
+  if(cur>0) show(cur-1);
+}
+function updateNav(){
+  const S=SC[cur];
+  $('#pos').textContent=(cur+1)+' / '+SC.length;
+  $('#prevBtn').disabled = cur===0;
+  const inSteps = S.steps && sub[cur]<S.steps-1;
+  const last = cur===SC.length-1;
+  const locked = !inSteps && !last && !passed(cur);
+  const nb=$('#nextBtn');
+  nb.classList.toggle('locked',locked);
+  nb.disabled = !!(last && S.atEnd && S.atEnd());
+  nb.textContent = inSteps ? '계속 →' : (last ? '다음 문제 →' : '다음 →');
+  if(!$('#hint').classList.contains('warn')){
+    let h='→ · Space · 휠: 다음   ← : 이전';
+    if(cur===3 && sub[3]===0) h='진폭·파장을 바꿔 보고, → 를 누르면 확인 문제';
+    else if(cur===7 && inSteps) h=`만들기 ${sub[7]+1} / 6 단계 · → 를 누르면 다음 단계`;
+    else if(inSteps) h=`단계 ${sub[cur]+1} / ${S.steps} · → 를 누르면 계속돼요`;
+    else if(locked) h='잠김 · '+(S.lock||'');
+    else if(cur===5) h='↑↓ 키 또는 휠로 파장 조절';
+    else if(cur===6) h='숫자 키 1~8로 연주할 수 있어요';
+    $('#hint').textContent=h;
+  }
+  $('#chips').innerHTML=SC.map((s,i)=>{
+    const cls=i===cur?'on':(i<cur&&passed(i)?'done':(canReach(i)?'':'lk'));
+    return `<button class="chip ${cls}" data-i="${i}">${i?i+' ':''}${s.name}</button>`;
+  }).join('');
+  $$('#chips .chip').forEach(c=>c.addEventListener('click',()=>{const i=+c.dataset.i; if(i!==cur&&canReach(i)) show(i);}));
+}
+$('#nextBtn').addEventListener('click',e=>{e.currentTarget.blur(); next();});
+$('#prevBtn').addEventListener('click',e=>{e.currentTarget.blur(); prev();});
+
+document.addEventListener('keydown',e=>{
+  if(!$('#modal').classList.contains('hidden')){ modalKey(e); return; }
+  const S=SC[cur];
+  if(S.keys && S.keys(e)){ e.preventDefault(); return; }
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){ e.preventDefault(); if(!e.repeat) next(); }
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); if(!e.repeat) prev(); }
+  else if(e.key==='Escape'){ stopAuto(); stop5(); }
+});
+let wheelT=0;
+window.addEventListener('wheel',e=>{
+  if(e.target.closest && e.target.closest('[data-wheel]')) return;
+  if(!$('#modal').classList.contains('hidden')) return;
+  const now=Date.now(); if(now-wheelT<700 || Math.abs(e.deltaY)<15) return;
+  wheelT=now; e.deltaY>0?next():prev();
+},{passive:true});
+
+/* 교사 모드 */
+let pwBuf='';
+function renderPw(){ $('#pw').innerHTML=Array.from({length:Math.max(4,TEACHER_PASSWORD.length)},(_,i)=>`<i class="${i<pwBuf.length?'f':''}"></i>`).join(''); }
+$('#keys').innerHTML=['1','2','3','4','5','6','7','8','9','취소','0','←'].map(k=>`<button data-k="${k}">${k}</button>`).join('');
+$$('#keys button').forEach(b=>b.addEventListener('click',()=>pwInput(b.dataset.k)));
+function pwInput(k){
+  if(k==='취소'){ closeModal(); return; }
+  if(k==='←'){ pwBuf=pwBuf.slice(0,-1); renderPw(); return; }
+  if(pwBuf.length>=TEACHER_PASSWORD.length) return;
+  pwBuf+=k; renderPw(); $('#pwMsg').textContent='';
+  if(pwBuf.length===TEACHER_PASSWORD.length){
+    if(pwBuf===TEACHER_PASSWORD){ teacher=true; closeModal(); setTeacherUI(); sfx(true); }
+    else{ $('#pwMsg').textContent='비밀번호가 맞지 않아요.'; sfx(false); pwBuf=''; setTimeout(renderPw,250); }
+  }
+}
+function modalKey(e){
+  e.preventDefault();
+  if(e.key==='Escape') closeModal();
+  else if(e.key==='Backspace') pwInput('←');
+  else if(/^[0-9]$/.test(e.key)) pwInput(e.key);
+}
+function openModal(){ pwBuf=''; renderPw(); $('#pwMsg').textContent=''; $('#modal').classList.remove('hidden'); }
+function closeModal(){ $('#modal').classList.add('hidden'); }
+function setTeacherUI(){
+  $('#lockBtn').classList.toggle('open',teacher);
+  $('#tBadge').classList.toggle('hidden',!teacher);
+  $('#shackle').setAttribute('d', teacher?'M8 11V7a4 4 0 0 1 7.5-2':'M8 11V7a4 4 0 0 1 8 0v4');
+  updateNav();
+}
+$('#lockBtn').addEventListener('click',e=>{ e.currentTarget.blur(); if(teacher){teacher=false; setTeacherUI();} else openModal(); });
+$('#modal').addEventListener('pointerdown',e=>{ if(e.target.id==='modal') closeModal(); });
+
+let lastT=performance.now();
+function loop(t){
+  const dt=Math.min(0.05,(t-lastT)/1000); lastT=t;
+  const S=SC[cur]; S.frame&&S.frame(dt);
+  requestAnimationFrame(loop);
+}
+window.addEventListener('resize',fit);
+renderTabs5(); renderRec5(); setLam5(30);
+fit(); show(0); requestAnimationFrame(loop);
+window.__lesson={show,next,prev,get cur(){return cur;},get sub(){return sub;}};
+})();
+</script>
+</body>
+</html>
