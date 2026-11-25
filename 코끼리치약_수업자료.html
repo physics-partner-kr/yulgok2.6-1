@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>코끼리 치약의 비밀</title>
+<style>
+:root{
+  --bg:#0a1330;--panel:rgba(255,255,255,.055);--panel2:rgba(255,255,255,.1);--line:rgba(255,255,255,.13);
+  --text:#f3f6ff;--sub:#b3bedf;--dim:#7d8bb5;
+  --blue:#5ac8fa;--green:#32d583;--red:#ff6b6b;--yellow:#ffd25a;--orange:#ff9f43;--purple:#b48cff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#050a1c;color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Nanum Gothic",sans-serif;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1100px 650px at 80% -15%,#1b2c68 0%,rgba(27,44,104,0) 60%),linear-gradient(160deg,#0d1839,#0a1330 55%,#081027)}
+sub{font-size:.68em;vertical-align:-.25em;line-height:0}
+b{font-weight:800}
+.hl{color:var(--yellow)} .hb{color:var(--blue)} .hg{color:var(--green)} .hp{color:var(--purple)} .ho{color:var(--orange)}
+
+/* header / footer */
+#hdr{position:absolute;left:0;right:0;top:0;height:92px;display:flex;align-items:center;gap:20px;padding:0 48px}
+#hnum{width:56px;height:56px;border-radius:17px;background:linear-gradient(135deg,#3b8cff,#7a5cff);display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
+#htitle{font-size:38px;font-weight:800;letter-spacing:-.6px}
+#htag{font-size:22px;font-weight:800;padding:6px 14px;border-radius:999px;background:rgba(180,140,255,.18);color:#d6c2ff;border:1px solid rgba(180,140,255,.4);display:none}
+#dots{margin-left:auto;display:flex;gap:9px;align-items:center}
+.dot{width:14px;height:14px;border-radius:7px;background:rgba(255,255,255,.16);transition:.3s;cursor:default}
+.dot.seen{background:rgba(255,255,255,.42);cursor:pointer}
+.dot.on{width:38px;background:var(--blue)}
+#scenes{position:absolute;left:0;right:0;top:92px;height:726px}
+footer{position:absolute;left:0;right:0;bottom:0;height:82px;display:flex;align-items:center;padding:0 48px;gap:18px}
+.navbtn{font:inherit;font-size:27px;font-weight:700;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px 26px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.navbtn:hover{background:rgba(255,255,255,.16)}
+#next{margin-left:auto;background:linear-gradient(135deg,#3b8cff,#2a6ee8);border-color:transparent}
+#next.locked{background:rgba(255,255,255,.08);color:var(--dim);border-color:var(--line)}
+#pageNo{font-size:26px;color:var(--sub);font-weight:700;margin-left:16px}
+#lockBtn{display:none;font:inherit;font-size:22px;color:var(--dim);background:none;border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:8px 14px;cursor:pointer}
+#lockBtn.show{display:block}
+#lockBtn.pulse{animation:pulse .9s 2}
+#teacherBadge{display:none;font-size:20px;color:#ffd25a;border:1px solid rgba(255,210,90,.5);border-radius:10px;padding:6px 12px}
+@keyframes pulse{50%{color:#ffd25a;border-color:#ffd25a;transform:scale(1.06)}}
+
+/* scenes */
+.scene{position:absolute;inset:0;padding:6px 48px 0;display:none}
+.scene.on{display:block;animation:fadein .45s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.row{display:flex;gap:30px}
+.col{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:24px}
+.q{font-size:31px;font-weight:700;line-height:1.4;letter-spacing:-.4px}
+.p{font-size:28px;line-height:1.5;color:var(--text)}
+.sub{font-size:24px;color:var(--sub);line-height:1.45}
+.lab{font-size:23px;font-weight:800;color:var(--blue);letter-spacing:.5px}
+.btn{font:inherit;font-size:28px;font-weight:700;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px 26px;cursor:pointer;transition:.15s}
+.btn:hover:not(:disabled){background:rgba(255,255,255,.17)}
+.btn.primary{background:linear-gradient(135deg,#3b8cff,#2a6ee8);border-color:transparent}
+.btn.primary:hover:not(:disabled){filter:brightness(1.12)}
+.btn:disabled{opacity:.35;cursor:default}
+.opt{font:inherit;font-size:27px;font-weight:600;color:var(--text);text-align:left;width:100%;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:15px 22px;cursor:pointer;display:flex;align-items:center;gap:16px;line-height:1.35;transition:background .15s,border-color .15s}
+.opt:hover{background:rgba(255,255,255,.1)}
+.opt .ab{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--sub)}
+.opts.sm .opt{font-size:25px;padding:12px 16px;gap:12px}
+.opt.sel{border-color:var(--blue);background:rgba(90,200,250,.13)}
+.opt.sel .ab{background:var(--blue);color:#06203a}
+.opt.correct{border-color:var(--green);background:rgba(50,213,131,.16)}
+.opt.correct .ab{background:var(--green);color:#052b18}
+.opt.wrong{border-color:var(--red);animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.locked{opacity:.38;pointer-events:none}
+.fb{font-size:25px;line-height:1.5;border-radius:16px;padding:0;min-height:0;transition:.2s}
+.fb.hint,.fb.ok{padding:14px 20px}
+.fb.hint{background:rgba(255,210,90,.11);border-left:6px solid var(--yellow);color:#ffe7a6}
+.fb.hint::before{content:"힌트  ";font-weight:800;color:var(--yellow)}
+.fb.ok{background:rgba(50,213,131,.12);border-left:6px solid var(--green);color:#cffbe2}
+.fb.ok::before{content:"정답!  ";font-weight:800;color:var(--green)}
+.note{font-size:21px;color:var(--dim);line-height:1.4}
+canvas{display:block}
+
+/* cover */
+.cover{display:flex;height:100%;gap:30px;align-items:stretch}
+.cover .l{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;padding-left:10px}
+.kicker{font-size:26px;font-weight:800;color:var(--blue);letter-spacing:2px}
+.cover h1{font-size:92px;font-weight:900;letter-spacing:-3px;line-height:1.05;background:linear-gradient(90deg,#fff,#ffc2dc 60%,#ffd25a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:33px;line-height:1.5;color:#dfe6ff;font-weight:600}
+.goals{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:22px 28px}
+.goals .gt{font-size:24px;font-weight:800;color:var(--yellow);margin-bottom:8px}
+.goals ol{padding-left:34px;font-size:27px;line-height:1.65}
+
+/* prep */
+.chips{display:flex;flex-wrap:wrap;gap:12px}
+.chip{font-size:25px;font-weight:700;padding:10px 18px;border-radius:14px;background:rgba(90,200,250,.1);border:1px solid rgba(90,200,250,.3)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:14px}
+.steps li{display:flex;gap:16px;font-size:28px;line-height:1.45;align-items:flex-start}
+.num{flex:none;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#06203a;font-weight:900;display:grid;place-items:center;font-size:24px;margin-top:-1px}
+.safe{display:flex;gap:18px;align-items:center;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.28);border-radius:20px;padding:16px 20px;font-size:27px;line-height:1.4}
+.safe svg{flex:none}
+
+/* observe */
+.obs{list-style:none;display:flex;flex-direction:column;gap:10px}
+.obs li{font-size:27px;line-height:1.4;display:flex;gap:12px;align-items:flex-start;opacity:0;transform:translateX(20px);transition:.5s}
+.obs li.show{opacity:1;transform:none}
+.obs li::before{content:"";flex:none;width:14px;height:14px;border-radius:50%;background:var(--yellow);margin-top:13px}
+#col2.done .pred:not(.sel){display:none}
+#col2.done .pred.sel{padding:10px 20px}
+
+/* gas tests */
+.tpanel{width:318px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px}
+.tpanel h3{font-size:27px;font-weight:800;text-align:center;line-height:1.3}
+.tpanel .res{font-size:24px;line-height:1.4;text-align:center;min-height:68px;color:var(--yellow);font-weight:700;opacity:0;transition:.5s}
+.tpanel.doneT .res{opacity:1}
+.stick{transition:transform 1.2s ease}
+.t-inc.go .stick{transform:translate(-10px,70px)}
+.flame{opacity:0;transform-origin:center bottom;transform-box:fill-box;transition:opacity .4s}
+.t-inc.lit .flame{opacity:1;animation:flick .18s infinite alternate}
+.t-match .flame{opacity:1;animation:flick .2s infinite alternate}
+@keyframes flick{from{transform:scale(1,1)}to{transform:scale(.92,1.08)}}
+.ember{transition:.4s}
+.t-inc.lit .ember{fill:#ffe08a}
+.match{transition:transform 1s ease}
+.t-match.go .match{transform:translate(-34px,24px)}
+.t-match.big .flame{animation:flickBig .15s infinite alternate}
+@keyframes flickBig{from{transform:scale(1.5,1.6)}to{transform:scale(1.35,1.8)}}
+.bubT{opacity:0}
+.t-lime.go .bubT{animation:bubT 1s linear infinite}
+@keyframes bubT{0%{opacity:0;transform:translateY(0)}15%{opacity:.9}100%{opacity:0;transform:translateY(-95px)}}
+.cnt{font-size:23px;color:var(--sub);font-weight:700}
+
+/* particle */
+.eq{font-size:34px;font-weight:800;display:flex;align-items:center;flex-wrap:wrap;gap:8px;line-height:1.5}
+.blankw{position:relative;display:inline-block}
+.blank{font:inherit;font-size:30px;font-weight:800;min-width:58px;height:54px;border-radius:12px;border:2px dashed rgba(255,255,255,.4);background:rgba(255,255,255,.06);color:var(--yellow);cursor:pointer;padding:0 10px}
+.blank.set{border-style:solid;border-color:var(--yellow)}
+.blank.ok{border-color:var(--green);color:var(--green);background:rgba(50,213,131,.12)}
+.blank.bad{border-color:var(--red);animation:shake .4s}
+#picker{position:absolute;z-index:50;display:none;background:#18244f;border:1px solid var(--line);border-radius:16px;padding:10px;gap:8px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+#picker button{font:inherit;font-size:28px;font-weight:800;width:58px;height:58px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
+#picker button:hover{background:var(--blue);color:#06203a}
+table.cnt5{border-collapse:separate;border-spacing:10px 8px;font-size:27px}
+table.cnt5 th{font-weight:800;color:var(--sub);font-size:24px}
+table.cnt5 td{text-align:center}
+.legend{display:flex;gap:22px;font-size:23px;color:var(--sub);align-items:center}
+.legend i{display:inline-block;width:22px;height:22px;border-radius:50%;margin-right:8px;vertical-align:-3px}
+
+/* catalyst */
+.mech{font-size:27px;line-height:1.5;padding:8px 16px;border-radius:12px;transition:.3s;color:var(--sub)}
+.mech.on{background:rgba(180,140,255,.16);color:#fff}
+.counter{display:flex;gap:16px}
+.counter div{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 16px;font-size:23px;color:var(--sub)}
+.counter b{display:block;font-size:40px;color:#fff}
+
+/* roles */
+.tog{font:inherit;font-size:24px;font-weight:700;padding:10px 16px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--dim);cursor:pointer;display:flex;align-items:center;gap:10px}
+.tog::before{content:"";width:22px;height:22px;border-radius:6px;border:2px solid var(--dim)}
+.tog.on{color:var(--text);border-color:var(--blue);background:rgba(90,200,250,.12)}
+.tog.on::before{background:var(--blue);border-color:var(--blue)}
+#pool{display:flex;flex-wrap:wrap;gap:12px;min-height:150px;align-content:flex-start;padding:14px;border-radius:20px;border:1px dashed rgba(255,255,255,.18)}
+.dcard{font-size:26px;font-weight:800;padding:13px 20px;border-radius:15px;background:#22336b;border:2px solid #3e58a8;cursor:grab;touch-action:none;position:relative;z-index:1;white-space:nowrap}
+.dcard.drag{cursor:grabbing;z-index:40;box-shadow:0 14px 30px rgba(0,0,0,.5);transition:none}
+.dcard.back{transition:transform .35s ease}
+.dcard.fixed{cursor:default;background:rgba(50,213,131,.18);border-color:var(--green)}
+.slot{display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 12px 10px 20px}
+.slot .txt{flex:1;font-size:25px;line-height:1.35}
+.slot .drop{width:262px;height:64px;border:2px dashed rgba(255,255,255,.25);border-radius:15px;display:flex;align-items:center;justify-content:center;flex:none}
+.slot.hover .drop{border-color:var(--blue);background:rgba(90,200,250,.1)}
+
+/* mass */
+.rise{opacity:0}
+.running .rise{animation:rise 1.6s ease-out infinite}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-110px)}}
+.wig{opacity:0;transition:opacity .6s}
+.running .wig,.fin .wig{opacity:1}
+.running .wig{animation:wig .5s infinite alternate}
+@keyframes wig{to{transform:translate(4px,-3px)}}
+
+/* summary */
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.scard{height:228px;border-radius:24px;background:var(--panel);border:1px solid var(--line);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:.25s}
+.scard:hover{background:rgba(255,255,255,.09)}
+.scard h4{font-size:30px;font-weight:800;display:flex;align-items:center;gap:12px}
+.scard h4 span{font-size:22px;width:38px;height:38px;border-radius:11px;background:rgba(90,200,250,.2);color:var(--blue);display:grid;place-items:center}
+.scard .body{font-size:26px;line-height:1.5;color:#e9eeff;opacity:0;transition:.35s}
+.scard .tap{font-size:22px;color:var(--dim)}
+.scard.open{border-color:rgba(90,200,250,.5);background:rgba(90,200,250,.08)}
+.scard.open .body{opacity:1}
+.scard.open .tap{display:none}
+.banner{display:flex;align-items:center;justify-content:center;gap:18px;font-size:44px;font-weight:800;padding:18px;border-radius:24px;background:linear-gradient(90deg,rgba(59,140,255,.18),rgba(180,140,255,.18));border:1px solid var(--line);margin-bottom:22px}
+.arrowcat{display:flex;flex-direction:column;align-items:center;font-size:22px;color:#d6c2ff;line-height:1.1}
+.arrowcat i{font-style:normal;font-size:48px;color:#fff;line-height:.9}
+
+/* quiz */
+.qwrap{width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.qhead{display:flex;align-items:center;gap:16px}
+.qprog{display:flex;gap:8px;margin-left:auto}
+.qprog i{width:44px;height:10px;border-radius:5px;background:rgba(255,255,255,.15)}
+.qprog i.done{background:var(--green)} .qprog i.cur{background:var(--blue)}
+
+/* toast & modal */
+#toast{position:absolute;left:50%;bottom:104px;transform:translate(-50%,20px);background:#1e2b5c;border:1px solid var(--line);color:#fff;font-size:26px;font-weight:700;padding:16px 28px;border-radius:18px;opacity:0;pointer-events:none;transition:.3s;z-index:60;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#modal{position:absolute;inset:0;background:rgba(3,7,20,.72);display:none;align-items:center;justify-content:center;z-index:70}
+#modal.show{display:flex}
+.mbox{width:520px;background:#141f47;border:1px solid var(--line);border-radius:28px;padding:30px;display:flex;flex-direction:column;gap:18px;align-items:center}
+.mbox h3{font-size:30px}
+#pwShow{font-size:40px;letter-spacing:14px;height:64px;width:100%;text-align:center;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--line);display:grid;place-items:center}
+.keypad{display:grid;grid-template-columns:repeat(3,96px);gap:10px}
+.keypad button{font:inherit;font-size:30px;font-weight:800;height:66px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:#fff;cursor:pointer}
+.keypad button:hover{background:rgba(255,255,255,.2)}
+#pwMsg{font-size:22px;color:var(--red);height:28px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <header id="hdr"><div id="hnum">1</div><div id="htitle"></div><div id="htag">심화</div><div id="dots"></div></header>
+
+  <div id="scenes">
+
+  <!-- 0 표지 -->
+  <section class="scene" data-id="cover" data-title="코끼리 치약의 비밀">
+    <div class="cover">
+      <div class="l">
+        <div class="kicker">화학 반응 탐구</div>
+        <h1>코끼리 치약의 비밀</h1>
+        <div class="lead">과산화 수소수에 아이오딘화 칼륨 용액을 넣으면<br>왜 거품이 치약처럼 솟아오를까?</div>
+        <div class="goals">
+          <div class="gt">오늘의 목표</div>
+          <ol>
+            <li>거품 속 기체를 확인하고 화학 변화의 증거를 찾는다.</li>
+            <li>반응을 입자 모형과 화학 반응식으로 나타낸다.</li>
+            <li>아이오딘화 칼륨·세제의 역할, 에너지·질량 변화를 설명한다.</li>
+          </ol>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px">
+          <button class="btn primary" id="startBtn">시작하기 →</button>
+          <span class="sub">→ 키 · Space · 마우스 휠로 넘겨요</span>
+        </div>
+      </div>
+      <div class="card" style="width:610px;padding:10px;height:712px"><canvas id="cvCover" data-w="588" data-h="690"></canvas></div>
+    </div>
+  </section>
+
+  <!-- 1 준비와 안전 -->
+  <section class="scene" data-id="prep" data-title="실험 준비와 안전">
+    <div class="row" style="height:712px">
+      <div class="card col" style="flex:1.15;gap:20px">
+        <div class="lab">준비물</div>
+        <div class="chips">
+          <span class="chip">과산화 수소수</span><span class="chip">아이오딘화 칼륨(KI) 용액</span><span class="chip">주방 세제</span>
+          <span class="chip">식용 색소</span><span class="chip">눈금실린더</span><span class="chip">큰 쟁반</span><span class="chip">보안경 · 장갑</span>
+        </div>
+        <div class="lab" style="margin-top:10px">실험 방법</div>
+        <ol class="steps">
+          <li><span class="num">1</span><span>눈금실린더를 쟁반 위에 세우고 <b>과산화 수소수</b>를 넣는다.</span></li>
+          <li><span class="num">2</span><span><b>주방 세제</b>와 <b>식용 색소</b>를 넣고 살짝 흔들어 섞는다.</span></li>
+          <li><span class="num">3</span><span><b>아이오딘화 칼륨 용액</b>을 한꺼번에 붓고 <b>바로 뒤로 물러선다.</b></span></li>
+          <li><span class="num">4</span><span>일어나는 변화를 눈으로 관찰하고, 실린더 바깥을 손등으로 살짝 대어 본다.</span></li>
+        </ol>
+        <div class="note">※ 과산화 수소수의 농도와 양은 선생님이 준비한 것을 사용해요. 농도가 진할수록 위험해요.</div>
+      </div>
+      <div class="col" style="flex:1;gap:16px">
+        <div class="lab" style="color:var(--red)">안전 수칙</div>
+        <div class="safe"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="22" width="56" height="22" rx="11" fill="none" stroke="#ff8a8a" stroke-width="4"/><circle cx="20" cy="33" r="7" fill="#ff8a8a"/><circle cx="44" cy="33" r="7" fill="#ff8a8a"/></svg><span><b>보안경과 실험용 장갑</b>을 반드시 착용한다.</span></div>
+        <div class="safe"><svg width="64" height="64" viewBox="0 0 64 64"><path d="M32 8 C44 24 50 32 50 42 a18 18 0 0 1 -36 0 C14 32 20 24 32 8Z" fill="none" stroke="#ff8a8a" stroke-width="4"/><path d="M24 44 a8 8 0 0 0 8 8" stroke="#ff8a8a" stroke-width="4" fill="none"/></svg><span>과산화 수소수가 피부에 닿으면 <b>즉시 많은 물로 씻는다.</b></span></div>
+        <div class="safe"><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="none" stroke="#ff8a8a" stroke-width="4"/><path d="M15 15 L49 49" stroke="#ff8a8a" stroke-width="4"/><circle cx="32" cy="30" r="6" fill="#ff8a8a"/></svg><span>붓고 나서 <b>실린더 입구를 들여다보지 않는다.</b></span></div>
+        <div class="safe"><svg width="64" height="64" viewBox="0 0 64 64"><path d="M22 54 V26 a4 4 0 0 1 8 0 V20 a4 4 0 0 1 8 0 V24 a4 4 0 0 1 8 0 V40 c0 8 -6 14 -14 14Z" fill="none" stroke="#ff8a8a" stroke-width="4"/><path d="M40 6 q4 6 0 12 M50 8 q4 6 0 12" stroke="#ffd25a" stroke-width="3" fill="none"/></svg><span>거품은 <b>뜨거울 수 있고</b> 반응하지 않은 과산화 수소가 남아 있을 수 있으니 <b>맨손으로 만지지 않는다.</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 예측과 관찰 -->
+  <section class="scene" data-id="observe" data-title="예측하고 관찰하기" data-gate="1">
+    <div class="row" style="height:712px">
+      <div class="card" style="width:660px;padding:10px;flex:none"><canvas id="cv2" data-w="638" data-h="690"></canvas></div>
+      <div class="col" id="col2" style="flex:1;gap:16px">
+        <div class="q">과산화 수소수 + 주방 세제 + 식용 색소가 든 실린더에 <span class="hp">아이오딘화 칼륨 용액</span>을 부으면 어떻게 될까?</div>
+        <div class="lab">① 먼저 예측해 보기</div>
+        <button class="opt pred" data-k="A"><span class="ab">A</span>아무 변화가 없다.</button>
+        <button class="opt pred" data-k="B"><span class="ab">B</span>기포가 조금 생기다가 만다.</button>
+        <button class="opt pred" data-k="C"><span class="ab">C</span>거품이 많이 생겨 실린더 밖으로 넘친다.</button>
+        <button class="btn primary" id="pour2" disabled style="align-self:flex-start">② 아이오딘화 칼륨 용액 붓기</button>
+        <div id="obsWrap2" style="display:none" class="col">
+          <div class="lab">③ 관찰 결과</div>
+          <ul class="obs" id="obs2">
+            <li><span>순식간에 거품이 생겨 실린더 밖으로 넘쳤다.</span></li>
+            <li><span>거품 속에는 <b>기체</b>가 가득 들어 있다.</span></li>
+            <li><span>무색이던 용액을 넣었는데 거품이 <b>노란 갈색</b>을 띠었다.</span></li>
+            <li><span>실린더가 <b>따뜻해지고</b> 김이 났다.</span></li>
+          </ul>
+          <div class="fb" id="cmp2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 화학 변화의 증거 -->
+  <section class="scene" data-id="evidence" data-title="화학 변화의 증거 찾기" data-gate="1">
+    <div class="row" style="height:712px">
+      <div class="col" style="flex:1.45;gap:14px">
+        <div class="q">다음 중 <span class="hl">새로운 물질이 생겼다(화학 변화)</span>는 증거를 <u>모두</u> 골라 보세요.</div>
+        <button class="opt ev" data-k="a"><span class="ab">1</span>기체가 발생해 거품이 생겼다.</button>
+        <button class="opt ev" data-k="b"><span class="ab">2</span>실린더가 따뜻해졌다(열이 났다).</button>
+        <button class="opt ev" data-k="c"><span class="ab">3</span>무색인 아이오딘화 칼륨 용액을 넣은 뒤 노란 갈색이 나타났다.</button>
+        <button class="opt ev" data-k="d"><span class="ab">4</span>식용 색소를 넣었더니 용액 전체에 색이 퍼졌다.</button>
+        <button class="opt ev" data-k="e"><span class="ab">5</span>주방 세제가 과산화 수소수에 골고루 섞였다.</button>
+        <div style="display:flex;gap:16px;align-items:center"><button class="btn primary" id="evCheck">확인하기</button><span class="sub" id="evCount">0개 선택</span></div>
+        <div class="fb" id="evFb"></div>
+      </div>
+      <div class="card col" style="flex:1;gap:18px">
+        <div class="lab">생각의 도구</div>
+        <div class="p"><b class="hb">물리 변화</b><br>모양이나 상태만 변하고, 물질의 성질은 그대로인 변화</div>
+        <div class="p"><b class="hl">화학 변화</b><br>처음과 <b>성질이 다른 새로운 물질</b>이 생기는 변화</div>
+        <div id="evExplain" style="display:none" class="col">
+          <div class="lab" style="color:var(--green)">화학 변화가 일어날 때 볼 수 있는 현상</div>
+          <div class="chips"><span class="chip">기체 발생</span><span class="chip">열·빛 발생</span><span class="chip">색 변화</span><span class="chip">앙금 생성</span></div>
+          <div class="sub">색소가 퍼지거나 세제가 섞이는 것은 물질이 섞이기만 한 것이라 성질이 그대로예요.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 기체 확인 -->
+  <section class="scene" data-id="gas" data-title="거품 속 기체의 정체" data-gate="1">
+    <div class="row" style="height:712px">
+      <div class="col" style="flex:none;width:990px;gap:14px">
+        <div class="q">거품을 모아 세 가지 방법으로 확인해 보자. <span class="cnt" id="gasCnt">(0 / 3)</span></div>
+        <div class="row" style="gap:18px">
+          <div class="card tpanel" id="tp1">
+            <h3>꺼져 가는 불씨<br>넣어 보기</h3>
+            <svg class="t-inc" viewBox="0 0 280 300" width="270" height="290">
+              <path d="M60 140 V278 Q60 292 74 292 H206 Q220 292 220 278 V140" fill="rgba(190,215,255,.06)" stroke="rgba(220,235,255,.6)" stroke-width="3"/>
+              <g fill="#ffd8e6" stroke="#e6a9c0" stroke-width="1.5" id="foamInc"></g>
+              <g class="stick">
+                <line x1="214" y1="6" x2="146" y2="112" stroke="#b07a4a" stroke-width="7" stroke-linecap="round"/>
+                <path class="flame" d="M142 74 C160 92 162 108 142 122 C122 108 124 92 142 74Z" fill="#ffb02e"/>
+                <circle class="ember" cx="144" cy="114" r="8" fill="#ff6a2a"/>
+              </g>
+            </svg>
+            <button class="btn" data-t="1">해 보기</button>
+            <div class="res">불씨가 다시<br>활활 타올랐다!</div>
+          </div>
+          <div class="card tpanel" id="tp2">
+            <h3>석회수에<br>통과시키기</h3>
+            <svg class="t-lime" viewBox="0 0 280 300" width="270" height="290">
+              <path d="M30 40 H136 V258" fill="none" stroke="rgba(220,235,255,.55)" stroke-width="7" stroke-linejoin="round"/>
+              <path d="M104 70 V256 Q104 288 140 288 Q176 288 176 256 V70" fill="rgba(190,215,255,.05)" stroke="rgba(220,235,255,.6)" stroke-width="3"/>
+              <path d="M107 150 V256 Q107 285 140 285 Q173 285 173 256 V150Z" fill="rgba(220,240,255,.28)"/>
+              <g fill="rgba(255,255,255,.85)">
+                <circle class="bubT" cx="136" cy="258" r="5" style="animation-delay:0s"/>
+                <circle class="bubT" cx="142" cy="258" r="4" style="animation-delay:.33s"/>
+                <circle class="bubT" cx="132" cy="258" r="4" style="animation-delay:.66s"/>
+              </g>
+              <text x="210" y="220" fill="#b3bedf" font-size="20" text-anchor="middle">석회수</text>
+            </svg>
+            <button class="btn" data-t="2">해 보기</button>
+            <div class="res">석회수가 뿌옇게<br>흐려지지 않았다.</div>
+          </div>
+          <div class="card tpanel" id="tp3">
+            <h3>성냥불을<br>입구에 대기</h3>
+            <svg class="t-match" viewBox="0 0 280 300" width="270" height="290">
+              <path d="M104 110 V256 Q104 288 140 288 Q176 288 176 256 V110" fill="rgba(255,220,235,.10)" stroke="rgba(220,235,255,.6)" stroke-width="3"/>
+              <text x="140" y="220" fill="#b3bedf" font-size="20" text-anchor="middle">모은 기체</text>
+              <g class="match">
+                <line x1="256" y1="40" x2="196" y2="86" stroke="#e8d2a6" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="194" cy="88" r="7" fill="#a33"/>
+                <path class="flame" d="M192 52 C206 66 208 80 192 92 C176 80 178 66 192 52Z" fill="#ffb02e"/>
+              </g>
+            </svg>
+            <button class="btn" data-t="3">해 보기</button>
+            <div class="res">'퍽' 소리 없이<br>불꽃이 더 밝아졌다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card col qblock" id="qGas" style="flex:1;gap:12px">
+        <div class="q">거품 속 기체는 무엇일까?</div>
+        <div class="col opts locked" style="gap:10px">
+          <button class="opt" data-k="co2"><span class="ab">A</span>이산화 탄소</button>
+          <button class="opt" data-k="o2"><span class="ab">B</span>산소</button>
+          <button class="opt" data-k="h2"><span class="ab">C</span>수소</button>
+          <button class="opt" data-k="vap"><span class="ab">D</span>수증기</button>
+        </div>
+        <div class="fb"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 입자 모형 -->
+  <section class="scene" data-id="particle" data-title="입자 모형으로 보기" data-gate="1">
+    <div class="row" style="height:712px">
+      <div class="card col" style="width:900px;flex:none;padding:16px 20px;gap:10px">
+        <div class="legend"><span><i style="background:#ff5d5d"></i>산소 원자(O)</span><span><i style="background:#eef2f8"></i>수소 원자(H)</span><span style="margin-left:auto" id="pStage">과산화 수소 분자 2개</span></div>
+        <svg id="svg5" viewBox="0 0 860 500" width="860" height="500"></svg>
+        <div style="display:flex;gap:14px">
+          <button class="btn primary" id="b5a">① 결합 끊기</button>
+          <button class="btn" id="b5b" disabled>② 새로 결합하기</button>
+          <button class="btn" id="b5c" style="margin-left:auto">↺ 처음으로</button>
+        </div>
+      </div>
+      <div class="col locked" id="q5" style="flex:1;gap:14px">
+        <div class="q">원자 수를 세어 보자</div>
+        <table class="cnt5">
+          <tr><th></th><th>수소(H) 원자</th><th>산소(O) 원자</th></tr>
+          <tr><th>반응 전</th><td><span class="blankw"><button class="blank" data-ans="4" data-opts="1,2,3,4,5,6" data-hint="반응 전 그림에서 흰색 수소 원자를 하나씩 세어 보세요.">?</button></span></td><td><span class="blankw"><button class="blank" data-ans="4" data-opts="1,2,3,4,5,6" data-hint="반응 전 그림에서 빨간 산소 원자를 하나씩 세어 보세요.">?</button></span></td></tr>
+          <tr><th>반응 후</th><td><span class="blankw"><button class="blank" data-ans="4" data-opts="1,2,3,4,5,6" data-hint="반응 후 물 분자 2개에 수소 원자가 몇 개씩 있나요?">?</button></span></td><td><span class="blankw"><button class="blank" data-ans="4" data-opts="1,2,3,4,5,6" data-hint="반응 후 물 분자와 산소 분자 속 산소 원자를 모두 더해 보세요.">?</button></span></td></tr>
+        </table>
+        <div class="q" style="margin-top:6px">화학 반응식 완성하기</div>
+        <div class="eq">
+          <span class="blankw"><button class="blank" data-ans="2" data-opts="1,2,3,4" data-hint="반응 전 그림에 과산화 수소 분자가 몇 개 있었나요?">?</button></span><span>H<sub>2</sub>O<sub>2</sub></span>
+          <span style="margin:0 6px">→</span>
+          <span class="blankw"><button class="blank" data-ans="2" data-opts="1,2,3,4" data-hint="반응 후 물 분자는 몇 개 생겼나요?">?</button></span><span>H<sub>2</sub>O</span>
+          <span style="margin:0 6px">+</span>
+          <span class="blankw"><button class="blank" data-ans="1" data-opts="1,2,3,4" data-hint="산소 분자(O₂) 1개에는 산소 원자가 2개 들어 있어요. 산소 원자 수가 반응 전후 같아지려면?">?</button></span><span>O<sub>2</sub></span>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center"><button class="btn primary" id="chk5">확인하기</button><span class="sub" id="q5msg">② 단계까지 본 뒤 풀 수 있어요</span></div>
+        <div class="fb" id="fb5"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 KI가 없으면 -->
+  <section class="scene" data-id="ki" data-title="아이오딘화 칼륨이 없다면?" data-gate="1">
+    <div class="row" style="height:712px;gap:24px">
+      <div class="card col" style="flex:none;width:660px;padding:16px;gap:8px">
+        <div class="sub" style="text-align:center">두 실린더 모두 <b>과산화 수소수 + 세제 + 색소</b></div>
+        <div class="row" style="gap:12px">
+          <div class="col" style="gap:4px;align-items:center"><div class="p" style="font-weight:800">A <span class="sub">물을 부음</span></div><canvas id="cv6a" data-w="300" data-h="490"></canvas></div>
+          <div class="col" style="gap:4px;align-items:center"><div class="p" style="font-weight:800">B <span class="sub">KI 용액을 부음</span></div><canvas id="cv6b" data-w="300" data-h="490"></canvas></div>
+        </div>
+        <button class="btn primary" id="run6" style="align-self:center">A, B에 동시에 붓기</button>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <div class="card" style="padding:12px 14px"><canvas id="cv6g" data-w="790" data-h="262"></canvas></div>
+        <div class="qblock col locked" id="q6" style="gap:10px">
+          <div class="q">아이오딘화 칼륨(KI)은 어떤 역할을 할까?</div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px" class="opts sm">
+            <button class="opt" data-k="slow"><span class="ab">A</span>과산화 수소의 분해를 느리게 한다.</button>
+            <button class="opt" data-k="own"><span class="ab">B</span>KI가 분해되어 산소를 내놓는다.</button>
+            <button class="opt" data-k="fast"><span class="ab">C</span>과산화 수소의 분해를 빠르게 한다.</button>
+            <button class="opt" data-k="film"><span class="ab">D</span>거품의 막을 튼튼하게 만든다.</button>
+          </div>
+          <div class="fb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 촉매 (심화) -->
+  <section class="scene" data-id="catalyst" data-title="일하고 돌아오는 아이오딘화 이온" data-tag="더 알아보기" data-gate="1">
+    <div class="row" style="height:712px;gap:24px">
+      <div class="card col" style="flex:none;width:940px;padding:16px 20px;gap:8px">
+        <div class="legend"><span><i style="background:#ff5d5d"></i>O</span><span><i style="background:#eef2f8"></i>H</span><span><i style="background:#9b6bff"></i>아이오딘화 이온(I<sup>−</sup>)</span><span style="margin-left:auto;font-size:20px">※ 실제 반응을 간단히 나타낸 모형</span></div>
+        <svg id="svg7" viewBox="0 0 900 400" width="900" height="400"></svg>
+        <div class="mech" id="m1">1단계 &nbsp; H<sub>2</sub>O<sub>2</sub> + <b class="hp">I<sup>−</sup></b> → H<sub>2</sub>O + <b class="hp">IO<sup>−</sup></b></div>
+        <div class="mech" id="m2">2단계 &nbsp; H<sub>2</sub>O<sub>2</sub> + <b class="hp">IO<sup>−</sup></b> → H<sub>2</sub>O + O<sub>2</sub> + <b class="hp">I<sup>−</sup></b></div>
+        <div style="display:flex;gap:12px;margin-top:4px">
+          <button class="btn primary" id="b7s">1단계 진행</button>
+          <button class="btn" id="b7auto">자동으로 3번 반복</button>
+        </div>
+      </div>
+      <div class="col" style="flex:1;gap:14px">
+        <div class="counter">
+          <div>생긴 O<sub>2</sub> 분자<b id="c7o">0</b></div>
+          <div>I<sup>−</sup> 이온<b id="c7i">1</b></div>
+        </div>
+        <div class="qblock col locked" id="q7" style="gap:10px">
+          <div class="q" style="font-size:29px">반응이 끝난 뒤 아이오딘화 이온(I<sup>−</sup>)은?</div>
+          <div class="col opts" style="gap:9px">
+            <button class="opt" data-k="gone"><span class="ab">A</span>모두 써서 없어진다.</button>
+            <button class="opt" data-k="o2"><span class="ab">B</span>산소 기체로 변한다.</button>
+            <button class="opt" data-k="back"><span class="ab">C</span>처음 상태로 돌아와 다시 쓰인다.</button>
+            <button class="opt" data-k="water"><span class="ab">D</span>물 분자의 일부가 된다.</button>
+          </div>
+          <div class="fb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 역할 정리 -->
+  <section class="scene" data-id="roles" data-title="재료마다 하는 일은?" data-gate="1">
+    <div class="row" style="height:712px;gap:24px">
+      <div class="card col" style="flex:none;width:580px;padding:14px;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tog on" data-o="soap">세제</button>
+          <button class="tog on" data-o="ki">KI 용액</button>
+          <button class="tog on" data-o="dye">색소</button>
+        </div>
+        <canvas id="cv8" data-w="550" data-h="500"></canvas>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="btn primary" id="run8">붓기</button>
+          <div class="sub" id="res8" style="font-size:23px;flex:1">재료를 빼거나 넣고 실험해 보세요.</div>
+        </div>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <div class="q" style="font-size:29px">재료 카드를 알맞은 역할 칸으로 끌어다 놓으세요.</div>
+        <div id="pool">
+          <div class="dcard" data-k="h2o2">과산화 수소수</div>
+          <div class="dcard" data-k="dye">식용 색소</div>
+          <div class="dcard" data-k="ki">아이오딘화 칼륨</div>
+          <div class="dcard" data-k="soap">주방 세제</div>
+        </div>
+        <div class="slot" data-acc="soap"><div class="txt">생긴 기체를 얇은 막으로 가두어 <b>거품</b>을 만든다.</div><div class="drop"></div></div>
+        <div class="slot" data-acc="h2o2"><div class="txt">분해되어 <b>산소와 물</b>이 되는 반응물</div><div class="drop"></div></div>
+        <div class="slot" data-acc="dye"><div class="txt">눈에 잘 보이게 <b>색</b>을 낸다. (반응과 무관)</div><div class="drop"></div></div>
+        <div class="slot" data-acc="ki"><div class="txt">반응을 빠르게 하고 자신은 그대로 남는 <b>촉매</b></div><div class="drop"></div></div>
+        <div class="fb" id="fb8"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 에너지 -->
+  <section class="scene" data-id="energy" data-title="열이 나는 반응" data-gate="1">
+    <div class="row" style="height:712px;gap:28px">
+      <div class="card col" style="flex:none;width:640px;padding:12px;gap:8px;align-items:center">
+        <canvas id="cv9" data-w="612" data-h="610"></canvas>
+        <button class="btn primary" id="run9">반응시키고 온도 보기</button>
+      </div>
+      <div class="col" style="flex:1;gap:14px">
+        <div class="qblock col locked" id="q9" style="gap:12px">
+          <div class="q">반응이 일어나자 실린더의 온도가 올라갔다.<br>이 반응은 어떤 반응일까?</div>
+          <div class="row opts" style="gap:14px">
+            <button class="opt" data-k="endo"><span class="ab">A</span>열을 흡수하는 흡열 반응</button>
+            <button class="opt" data-k="exo"><span class="ab">B</span>열을 방출하는 발열 반응</button>
+          </div>
+          <div class="fb"></div>
+        </div>
+        <div class="card col" id="ediag" style="display:none;gap:6px;padding:18px 22px">
+          <div class="lab">에너지로 보면</div>
+          <svg viewBox="0 0 760 270" width="760" height="270">
+            <line x1="40" y1="20" x2="40" y2="250" stroke="#7d8bb5" stroke-width="3"/>
+            <path d="M32 34 L40 18 L48 34" fill="none" stroke="#7d8bb5" stroke-width="3"/>
+            <text x="56" y="30" fill="#b3bedf" font-size="22">에너지</text>
+            <line x1="90" y1="80" x2="330" y2="80" stroke="#5ac8fa" stroke-width="6"/>
+            <text x="210" y="66" fill="#fff" font-size="26" font-weight="800" text-anchor="middle">2H₂O₂ (반응물)</text>
+            <line x1="420" y1="210" x2="700" y2="210" stroke="#32d583" stroke-width="6"/>
+            <text x="560" y="244" fill="#fff" font-size="26" font-weight="800" text-anchor="middle">2H₂O + O₂ (생성물)</text>
+            <path d="M330 80 Q380 80 380 120 L380 190" fill="none" stroke="#ff9f43" stroke-width="5"/>
+            <path d="M368 176 L380 204 L392 176" fill="none" stroke="#ff9f43" stroke-width="5"/>
+            <text x="404" y="140" fill="#ffb86b" font-size="25" font-weight="800">에너지 방출 → 주변이 따뜻해짐</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 질량 -->
+  <section class="scene" data-id="mass" data-title="반응 전후의 질량" data-gate="1">
+    <div class="row" style="height:712px;gap:24px">
+      <div class="card col" style="flex:none;width:950px;padding:16px;gap:6px">
+        <div class="row" style="gap:20px">
+          <div class="col" style="gap:0;align-items:center"><div class="p" style="font-weight:800">A 열린 곳 (쟁반 위)</div><svg id="svgA" viewBox="0 0 440 400" width="440" height="400"></svg></div>
+          <div class="col" style="gap:0;align-items:center"><div class="p" style="font-weight:800">B 닫힌 용기 <span class="sub">(생각 실험)</span></div><svg id="svgB" viewBox="0 0 440 400" width="440" height="400"></svg></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center"><button class="btn primary" id="run10">반응시키기</button><button class="btn" id="rst10">처음으로</button></div>
+        <div class="note">※ 넣을 KI 용액도 처음부터 함께 저울 위에 두고 잰 예시 수치예요.<br>※ 실제로 밀폐 용기에서 하면 기체 압력 때문에 용기가 터질 수 있어 매우 위험해요. 머릿속으로만!</div>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <div class="qblock col locked opts sm" id="q10" style="gap:9px">
+          <div class="q" style="font-size:28px">A의 질량만 줄어든 까닭은?</div>
+          <button class="opt" data-k="atom"><span class="ab">A</span>원자 일부가 사라져서</button>
+          <button class="opt" data-k="gas"><span class="ab">B</span>생긴 산소가 공기 중으로 빠져나가서</button>
+          <button class="opt" data-k="ki"><span class="ab">C</span>KI가 다 써서 없어져서</button>
+          <button class="opt" data-k="light"><span class="ab">D</span>거품이 가벼워서 잘못 재어져서</button>
+          <div class="fb"></div>
+        </div>
+        <div class="card" id="law10" style="display:none;padding:12px 18px">
+          <div class="lab">질량 보존 법칙</div>
+          <div class="sub" style="color:#e9eeff;font-size:24px">반응 전후 물질 전체의 질량은 같다.<br><b class="hl">3.40 g</b> H₂O₂ → <b class="hb">1.80 g</b> H₂O + <b class="hg">1.60 g</b> O₂</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 정리 -->
+  <section class="scene" data-id="summary" data-title="한눈에 정리하기">
+    <div class="banner">
+      <span>2H<sub>2</sub>O<sub>2</sub></span>
+      <span class="arrowcat">KI (촉매)<i>⟶</i></span>
+      <span>2H<sub>2</sub>O + O<sub>2</sub></span>
+      <span style="color:var(--orange)">+ 열</span>
+    </div>
+    <div class="sgrid">
+      <div class="scard"><h4><span>1</span>거품 속 기체</h4><div class="tap">눌러서 확인</div><div class="body"><b>산소</b> — 꺼져 가는 불씨를 다시 타오르게 한다.</div></div>
+      <div class="scard"><h4><span>2</span>화학 변화의 증거</h4><div class="tap">눌러서 확인</div><div class="body">기체 발생 · 열 발생 · 색 변화 → <b>새로운 물질</b>이 생겼다.</div></div>
+      <div class="scard"><h4><span>3</span>원자의 배열</h4><div class="tap">눌러서 확인</div><div class="body">원자의 종류와 수는 그대로, <b>배열만 바뀐다.</b> (H 4개, O 4개)</div></div>
+      <div class="scard"><h4><span>4</span>아이오딘화 칼륨</h4><div class="tap">눌러서 확인</div><div class="body">분해를 <b>빠르게</b> 하고 자신은 그대로 남는 <b>촉매</b></div></div>
+      <div class="scard"><h4><span>5</span>주방 세제</h4><div class="tap">눌러서 확인</div><div class="body">생긴 산소를 얇은 막으로 <b>가두어</b> 거품을 만든다.</div></div>
+      <div class="scard"><h4><span>6</span>에너지와 질량</h4><div class="tap">눌러서 확인</div><div class="body"><b>발열 반응</b>이며, 닫힌 곳에서는 전체 <b>질량이 보존</b>된다.</div></div>
+    </div>
+    <div style="margin-top:20px;display:flex;justify-content:flex-end"><button class="btn" id="openAll">모두 펼치기</button></div>
+  </section>
+
+  <!-- 12 확인 문제 -->
+  <section class="scene" data-id="quiz" data-title="확인 문제">
+    <div class="qwrap" id="quizWrap">
+      <div class="qhead"><div class="lab" id="qNo">문제 1 / 6</div><div class="qprog" id="qProg"></div></div>
+      <div class="q" id="qText" style="font-size:34px;min-height:96px"></div>
+      <div class="col" id="qOpts" style="gap:12px"></div>
+      <div class="fb" id="qFb"></div>
+      <button class="btn primary" id="qNext" style="align-self:flex-end;display:none">다음 문제 →</button>
+    </div>
+    <div class="qwrap" id="quizEnd" style="display:none;align-items:center;justify-content:center;height:700px;text-align:center">
+      <svg width="140" height="140" viewBox="0 0 100 100"><path d="M50 6 L62 38 L96 38 L68 58 L79 92 L50 71 L21 92 L32 58 L4 38 L38 38Z" fill="#ffd25a"/></svg>
+      <div style="font-size:56px;font-weight:900">모든 문제 해결!</div>
+      <div class="p" style="color:var(--sub)">코끼리 치약 속 화학 반응을 설명할 수 있게 되었어요.</div>
+      <button class="btn" id="qRetry">다시 풀기</button>
+    </div>
+  </section>
+
+  </div>
+
+  <footer>
+    <button class="navbtn" id="prev">← 이전</button>
+    <span id="pageNo">1 / 13</span>
+    <span id="teacherBadge">교사 모드</span>
+    <button id="lockBtn" title="교사용 건너뛰기">🔒 교사용</button>
+    <button class="navbtn" id="next">다음 →</button>
+  </footer>
+
+  <div id="picker"></div>
+  <div id="toast"></div>
+  <div id="modal">
+    <div class="mbox">
+      <h3>교사용 비밀번호</h3>
+      <div id="pwShow"></div>
+      <div class="keypad" id="keypad"></div>
+      <div id="pwMsg"></div>
+      <div style="display:flex;gap:12px"><button class="btn" id="pwCancel">취소</button><button class="btn primary" id="pwOk">확인</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 설정 ===== */
+const TEACHER_PASSWORD = '1234';   // 교사용 건너뛰기 비밀번호 (숫자)
+
+/* ===== 공통 ===== */
+const $=s=>document.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+const stage=$('#stage'); let SCALE=1;
+function fit(){const w=innerWidth,h=innerHeight;SCALE=Math.min(w/1600,h/900);
+  stage.style.transform=`translate(${(w-1600*SCALE)/2}px,${(h-900*SCALE)/2}px) scale(${SCALE})`}
+addEventListener('resize',fit);fit();
+
+/* 효과음 (Web Audio, 없으면 무시) */
+const SFX={c:null,
+  get(){if(!this.c){try{this.c=new (window.AudioContext||window.webkitAudioContext)()}catch(e){this.c=null}}
+    if(this.c&&this.c.state==='suspended')this.c.resume();return this.c},
+  tone(f,d,type='sine',g=.12,w=0){const c=this.get();if(!c)return;try{const o=c.createOscillator(),gn=c.createGain(),t=c.currentTime+w;
+    o.type=type;o.frequency.value=f;gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+.01);gn.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(gn).connect(c.destination);o.start(t);o.stop(t+d+.05)}catch(e){}},
+  ok(){this.tone(880,.18);this.tone(1320,.3,'sine',.1,.1)},
+  no(){this.tone(196,.25,'triangle',.13)},
+  whoosh(){const c=this.get();if(!c)return;try{const len=c.sampleRate*1.8|0,b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.5);
+    const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type='bandpass';f.Q.value=.8;
+    f.frequency.setValueAtTime(300,c.currentTime);f.frequency.linearRampToValueAtTime(1400,c.currentTime+1.4);
+    const g=c.createGain();g.gain.value=.22;s.connect(f).connect(g).connect(c.destination);s.start()}catch(e){}}
+};
+
+/* 애니메이션 루프 */
+const tickers=new Set();let lastT=performance.now();
+function frame(ts){const dt=Math.min(.05,(ts-lastT)/1000);lastT=ts;
+  tickers.forEach(f=>{let r;try{r=f(dt)}catch(e){console.error(e);r=false}if(r===false)tickers.delete(f)});
+  requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function tween(dur,fn){return new Promise(res=>{let t=0;tickers.add(dt=>{t+=dt;const k=Math.min(1,t/dur);fn(k);if(k>=1){res();return false}})})}
+const wait=s=>new Promise(r=>setTimeout(r,s*1000));
+
+function setupCanvas(cv){const w=+cv.dataset.w,h=+cv.dataset.h;cv.style.width=w+'px';cv.style.height=h+'px';
+  cv.width=w*2;cv.height=h*2;const ctx=cv.getContext('2d');ctx.setTransform(2,0,0,2,0,0);return{ctx,w,h}}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);
+  c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath()}
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+const rgb=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const DYE=hex('#ff4f9a'),CLEAR=[205,228,248],IODINE=[214,148,38],WHITE=[255,255,255];
+const FONT='-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif';
+
+/* ===== 코끼리 치약 시뮬레이션 (모식적) ===== */
+class FoamSim{
+  constructor(cv,opt={}){const s=setupCanvas(cv);this.ctx=s.ctx;this.W=s.w;this.H=s.h;
+    this.opt=Object.assign({soap:true,ki:true,dye:true,temp:false,label:true},opt);
+    this._tick=dt=>this.update(dt);this.geom();this.reset()}
+  geom(){const W=this.W,H=this.H,o=this.opt;
+    this.trayY=H-30;this.tx0=W*.04;this.tx1=o.temp?W*.82:W*.96;
+    this.cw=clamp(W*.21,60,120);this.ch=Math.min(H*.5,360);
+    this.cx=o.temp?W*.42:W*.5;this.bot=this.trayY-14;this.top=this.bot-this.ch;
+    this.liq0=this.ch*.3;this.r0=this.cw*.08;this.bw=this.r0*1.15;
+    this.nb=Math.ceil((this.tx1-this.tx0)/this.bw)}
+  set(o){Object.assign(this.opt,o);this.geom();this.reset()}
+  reset(){tickers.delete(this._tick);
+    Object.assign(this,{state:'idle',t:0,rt:0,p:0,rate:0,tube:[],free:[],land:[],bub:[],steam:[],puffs:[],acc:0,bacc:0,sacc:0,done:false,after:0,temp:0,liqH:this.liq0});
+    this.hm=new Float32Array(this.nb);const half=this.cw/2+5;
+    for(let i=0;i<this.nb;i++){const x=this.tx0+(i+.5)*this.bw;if(Math.abs(x-this.cx)<=half)this.hm[i]=this.trayY-this.top}
+    this.draw()}
+  start(){this.reset();this.state='pour';tickers.add(this._tick)}
+  liquidColor(){const b=this.opt.dye?DYE:CLEAR;const io=this.opt.ki?Math.min(1,this.p*1.5)*.55:0;return mix(b,IODINE,io)}
+  update(dt){const o=this.opt;this.t+=dt;
+    if(this.state==='pour'&&this.t>=.8){this.state='react';this.rt=0;if(o.ki&&o.sound!==false)SFX.whoosh()}
+    if(this.state==='react'){this.rt+=dt;const tau=o.ki?1.6:6000;const np=1-Math.exp(-this.rt/tau);
+      this.rate=(np-this.p)/dt;this.p=np;
+      if(this.rt>(o.ki?7.5:5.5)){this.state='end';this.done=true;this.rate=0;o.onDone&&o.onDone(this)}}
+    if(this.state==='end')this.after+=dt;
+    this.temp+=((o.ki?this.p:0)-this.temp)*Math.min(1,dt*1.5);
+    if(o.soap)this.liqH=this.liq0*(1-.4*this.p);
+    const liqTop=this.bot-this.liqH,L=this.cx-this.cw/2+5,R=this.cx+this.cw/2-5;
+    // 액체 속 기포
+    const br=this.state==='react'?(o.ki?this.rate*160+2:.5):0;this.bacc+=br*dt;
+    while(this.bacc>=1){this.bacc--;this.bub.push({x:rand(L+3,R-3),y:this.bot-rand(3,this.liqH*.9),r:rand(1.5,3.8)*this.cw/110+.5,vy:-rand(50,130)})}
+    for(const b of this.bub){b.y+=b.vy*dt;b.x+=Math.sin(b.y*.2)*.3;if(b.y<=liqTop){b.dead=1;
+      if(!o.soap&&o.ki&&this.puffs.length<40&&Math.random()<.35)this.puffs.push({x:rand(L,R),y:this.top-4,a:.9,vy:-rand(40,90),txt:Math.random()<.12})}}
+    this.bub=this.bub.filter(b=>!b.dead);
+    for(const p of this.puffs){p.y+=p.vy*dt;p.a-=dt*.45;if(p.a<=0)p.dead=1}
+    this.puffs=this.puffs.filter(p=>!p.dead);
+    // 거품
+    if(o.soap&&this.state!=='pour'&&this.state!=='idle'){
+      const v=this.rate*this.H*2.3,inner=this.cw-8,dens=(inner/(1.5*this.r0))/(1.5*this.r0);
+      for(const f of this.tube){f.y-=v*dt;f.x=clamp(f.x+(Math.random()-.5)*v*dt*.06,L+f.r*.5,R-f.r*.5);
+        if(f.y<this.top-f.r*.2){f.out=1;f.vx=((f.x-this.cx)/(this.cw/2))*rand(30,110)+rand(-35,35);
+          f.vy=-Math.min(v*.5,this.H*.55)*rand(.55,1);this.free.push(f)}}
+      this.tube=this.tube.filter(f=>!f.out);
+      this.acc+=v*dt*dens;const tot=()=>this.tube.length+this.free.length+this.land.length;
+      while(this.acc>=1){this.acc--;if(tot()>1800)continue;const r=this.r0*rand(.65,1.35);
+        const fc=mix(WHITE,this.liquidColor(),o.dye?.5:.3);
+        this.tube.push({x:rand(L+r*.5,R-r*.5),y:liqTop-r*.4-rand(0,v*dt),r,c:mix(fc,WHITE,rand(0,.2))})}
+      const g=this.H*1.4;
+      for(const f of this.free){f.vy+=g*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;
+        if(f.x<this.tx0+f.r){f.x=this.tx0+f.r;f.vx*=-.3}if(f.x>this.tx1-f.r){f.x=this.tx1-f.r;f.vx*=-.3}
+        const b=clamp(Math.floor((f.x-this.tx0)/this.bw),0,this.nb-1);
+        if(f.vy>0&&f.y+f.r*.5>=this.trayY-this.hm[b]){this.settle(f,b);f.dead=1}}
+      this.free=this.free.filter(f=>!f.dead)}
+    for(const f of this.land){const k=Math.min(1,dt*7);f.x+=(f.tx-f.x)*k;f.y+=(f.ty-f.y)*k}
+    // 김
+    if(o.ki&&this.temp>.25&&this.state!=='idle'){this.sacc+=dt*7*this.temp;
+      while(this.sacc>=1){this.sacc--;if(this.steam.length>50)break;
+        let peak=0,pb=0;for(let i=0;i<this.nb;i++)if(this.hm[i]>peak){peak=this.hm[i];pb=i}
+        const sx=o.soap?this.tx0+(pb+.5)*this.bw+rand(-this.cw*.6,this.cw*.6):this.cx+rand(-this.cw*.3,this.cw*.3);
+        this.steam.push({x:sx,y:this.trayY-peak-8,r:rand(6,12),a:.22,vy:-rand(25,55),vx:rand(-10,10)})}}
+    for(const s of this.steam){s.y+=s.vy*dt;s.x+=s.vx*dt;s.r+=dt*14;s.a-=dt*.09;if(s.a<=0)s.dead=1}
+    this.steam=this.steam.filter(s=>!s.dead);
+    this.draw();
+    if(this.state==='end'&&this.after>3&&!this.free.length&&this.steam.length===0)return false;
+    if(this.after>9)return false}
+  settle(f,b){const hm=this.hm,thr=f.r*1.25;
+    for(let k=0;k<300;k++){const l=b>0?hm[b-1]:1e9,r=b<this.nb-1?hm[b+1]:1e9,m=Math.min(l,r);
+      if(hm[b]-m>thr)b=(l<r||(l===r&&Math.random()<.5))?b-1:b+1;else break}
+    f.ty=this.trayY-hm[b]-f.r*.4;hm[b]+=f.r*.7;if(b>0)hm[b-1]+=f.r*.18;if(b<this.nb-1)hm[b+1]+=f.r*.18;
+    f.tx=this.tx0+(b+.5)*this.bw+rand(-this.bw*.45,this.bw*.45);this.land.push(f)}
+  foam(arr){const c=this.ctx;
+    for(const f of arr){c.fillStyle=rgb(mix(f.c,[90,60,80],.3),.95);c.beginPath();c.arc(f.x,f.y,f.r+1.3,0,6.283);c.fill()}
+    for(const f of arr){c.fillStyle=rgb(f.c);c.beginPath();c.arc(f.x,f.y,f.r,0,6.283);c.fill()}
+    c.fillStyle='rgba(255,255,255,.6)';for(const f of arr){c.beginPath();c.arc(f.x-f.r*.35,f.y-f.r*.35,f.r*.26,0,6.283);c.fill()}}
+  draw(){const c=this.ctx,o=this.opt,W=this.W,H=this.H;c.clearRect(0,0,W,H);
+    const L=this.cx-this.cw/2,R=this.cx+this.cw/2,lt=this.bot-this.liqH;
+    // 쟁반
+    c.fillStyle='rgba(255,255,255,.1)';rr(c,this.tx0-6,this.trayY,this.tx1-this.tx0+12,12,6);c.fill();
+    // 받침
+    c.fillStyle='rgba(190,215,255,.2)';rr(c,this.cx-this.cw*.8,this.bot,this.cw*1.6,14,5);c.fill();
+    // 유리 몸통
+    c.fillStyle='rgba(190,215,255,.06)';c.fillRect(L,this.top,this.cw,this.ch);
+    // 액체
+    const lc=this.liquidColor();const gr=c.createLinearGradient(L,0,R,0);
+    gr.addColorStop(0,rgb(mix(lc,[0,0,0],.18),.9));gr.addColorStop(.5,rgb(lc,.9));gr.addColorStop(1,rgb(mix(lc,[0,0,0],.25),.9));
+    c.fillStyle=gr;c.fillRect(L+3,lt,this.cw-6,this.liqH-2);
+    c.fillStyle='rgba(255,255,255,.75)';for(const b of this.bub){c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill()}
+    // 실린더 안 거품
+    c.save();c.beginPath();c.rect(L+2,this.top-30,this.cw-4,this.bot-this.top+30);c.clip();this.foam(this.tube);c.restore();
+    // 유리 윤곽 + 눈금
+    c.strokeStyle='rgba(220,235,255,.7)';c.lineWidth=2.5;c.beginPath();
+    c.moveTo(L-5,this.top-3);c.lineTo(L,this.top+4);c.lineTo(L,this.bot);c.lineTo(R,this.bot);c.lineTo(R,this.top+4);c.lineTo(R+5,this.top-3);c.stroke();
+    c.lineWidth=1.5;c.strokeStyle='rgba(220,235,255,.4)';
+    for(let i=1;i<10;i++){const y=this.bot-this.ch*i/10;c.beginPath();c.moveTo(L+3,y);c.lineTo(L+(i%5?10:20),y);c.stroke()}
+    c.fillStyle='rgba(255,255,255,.12)';c.fillRect(R-12,this.top+12,4,this.ch-30);
+    // 밖으로 나온 거품
+    this.foam(this.land);this.foam(this.free);
+    // 기체 빠져나감(세제 없음)
+    for(const p of this.puffs){if(p.txt){c.fillStyle=`rgba(255,255,255,${p.a})`;c.font=`800 ${this.W<400?16:20}px ${FONT}`;c.textAlign='center';c.fillText('O₂',p.x,p.y)}
+      else{c.strokeStyle=`rgba(255,255,255,${p.a*.6})`;c.lineWidth=1.5;c.beginPath();c.arc(p.x,p.y,3,0,6.283);c.stroke()}}
+    // 김
+    for(const s of this.steam){const g=c.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);g.addColorStop(0,`rgba(255,255,255,${s.a})`);g.addColorStop(1,'rgba(255,255,255,0)');
+      c.fillStyle=g;c.beginPath();c.arc(s.x,s.y,s.r,0,6.283);c.fill()}
+    this.drawBeaker();
+    if(o.temp)this.drawThermo()}
+  drawBeaker(){const c=this.ctx,o=this.opt;let a=0,alpha=1,stream=0;
+    if(this.state==='pour'){a=ease(Math.min(1,this.t/.45))*1.85;stream=this.t>.32?1:0}
+    else if(this.state!=='idle'){a=1.85;alpha=Math.max(0,1-(this.rt)/.5);stream=this.rt<.15?1:0}
+    if(alpha<=0)return;
+    const s=this.cw*.55,bh=s*1.15,lx=this.cx+this.cw*.18,ly=this.top-this.cw*.55-bh*0;
+    const px=this.cx+this.cw*.5+s*.15,py=this.top-bh-12;
+    c.save();c.globalAlpha=alpha;
+    if(stream){c.strokeStyle='rgba(225,238,255,.75)';c.lineWidth=Math.max(3,this.cw*.05);c.beginPath();
+      c.moveTo(lx,ly+4);c.quadraticCurveTo(lx-4,(ly+this.bot)/2,lx-2,this.bot-this.liqH);c.stroke()}
+    if(this.state==='idle'){c.translate(px,py)}else{const k=ease(Math.min(1,this.t/.45));c.translate(px+(lx-px)*k,py+(ly-py)*k);}
+    c.rotate(-a);
+    c.fillStyle=o.ki?'rgba(230,240,255,.35)':'rgba(170,210,255,.3)';
+    if(a<1.2)c.fillRect(2,bh*.4,s-4,bh*.6-2);
+    c.strokeStyle='rgba(220,235,255,.85)';c.lineWidth=2.5;c.beginPath();c.moveTo(-3,-2);c.lineTo(0,0);c.lineTo(0,bh);c.lineTo(s,bh);c.lineTo(s,0);c.stroke();
+    c.restore();
+    if(this.state==='idle'&&o.label){c.fillStyle='#dfe6ff';c.font=`700 ${this.W<400?16:21}px ${FONT}`;c.textAlign='center';
+      c.fillText(o.ki?'KI 용액':'물',px+s/2,py-10)}}
+  drawThermo(){const c=this.ctx,x=this.W-48,y0=this.top-10,y1=this.bot-20;
+    c.fillStyle='#dfe6ff';c.font=`700 20px ${FONT}`;c.textAlign='center';c.fillText('실린더',x,y0-36);c.fillText('온도',x,y0-12);
+    c.fillStyle='rgba(255,255,255,.12)';rr(c,x-11,y0,22,y1-y0,11);c.fill();
+    c.beginPath();c.arc(x,y1+12,20,0,6.283);c.fillStyle='#ff4d4d';c.fill();
+    const f=.32+.55*this.temp,yy=y1-(y1-y0-10)*f;c.fillStyle='#ff4d4d';rr(c,x-6,yy,12,y1-yy+10,6);c.fill();
+    const ry=y1-(y1-y0-10)*.32;c.strokeStyle='#ffd25a';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();c.moveTo(x-34,ry);c.lineTo(x+14,ry);c.stroke();c.setLineDash([]);
+    c.fillStyle='#ffd25a';c.font=`700 18px ${FONT}`;c.textAlign='right';c.fillText('처음',x-16,ry-8);
+    if(this.temp>.2){c.fillStyle='#ff8a8a';c.textAlign='center';c.font=`800 20px ${FONT}`;c.fillText('▲ 올라감',x-10,y1+56)}}
+}
+
+/* ===== SVG 원자 모형 ===== */
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const ATOM={O:{r:26,f:'#ff5d5d',t:'#4a0c0c'},H:{r:18,f:'#eef2f8',t:'#2a3350'},I:{r:38,f:'#9b6bff',t:'#fff'}};
+class Mol{constructor(svg){this.svg=svg;this.gb=mk('g',{},svg);this.ga=mk('g',{},svg);this.A={};this.B=[];this.L=[]}
+  add(id,t,x,y,op=1){const g=mk('g',{},this.ga);const d=ATOM[t];
+    mk('circle',{r:d.r,fill:d.f,stroke:'rgba(0,0,0,.25)','stroke-width':2},g);
+    mk('circle',{r:d.r*.3,cx:-d.r*.35,cy:-d.r*.35,fill:'rgba(255,255,255,.45)'},g);
+    const tx=mk('text',{'text-anchor':'middle','dominant-baseline':'central','font-size':d.r*.95,'font-weight':800,fill:d.t,'font-family':'sans-serif'},g);tx.textContent=t;
+    this.A[id]={g,x,y,op};this.render()}
+  bonds(list){this.B=list;this.gb.innerHTML='';this.L=list.map(()=>mk('line',{stroke:'#c3cde6','stroke-width':10,'stroke-linecap':'round'},this.gb));this.render()}
+  render(){for(const id in this.A){const a=this.A[id];a.g.setAttribute('transform',`translate(${a.x.toFixed(1)},${a.y.toFixed(1)})`);a.g.setAttribute('opacity',a.op)}
+    this.B.forEach(([p,q],i)=>{const a=this.A[p],b=this.A[q],l=this.L[i];l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);l.setAttribute('opacity',Math.min(a.op,b.op))})}
+  set(tg){for(const id in tg){const a=this.A[id],g=tg[id];a.x=g[0];a.y=g[1];if(g[2]!=null)a.op=g[2]}this.render()}
+  to(tg,dur=.9){const st={};for(const id in tg){const a=this.A[id];st[id]=[a.x,a.y,a.op]}
+    return tween(dur,k=>{const e=ease(k);for(const id in tg){const a=this.A[id],s=st[id],g=tg[id];a.x=s[0]+(g[0]-s[0])*e;a.y=s[1]+(g[1]-s[1])*e;if(g[2]!=null)a.op=s[2]+(g[2]-s[2])*e}this.render()})}}
+const h2o2=(cx,cy,ids,op=1)=>{const P=[[cx-74,cy-32],[cx-26,cy+6],[cx+26,cy-6],[cx+74,cy+32]];const o={};ids.forEach((id,i)=>o[id]=[...P[i],op]);return o};
+const water=(cx,cy,[o,h1,h2],op=1)=>({[o]:[cx,cy,op],[h1]:[cx-50,cy+36,op],[h2]:[cx+50,cy+36,op]});
+
+/* ===== 장면 관리 ===== */
+const scenes=$$('.scene'),N=scenes.length;let cur=0,maxSeen=0,teacher=false;
+const solved=new Array(N).fill(false);const idx=id=>scenes.findIndex(s=>s.dataset.id===id);
+const gated=i=>scenes[i].dataset.gate==='1';
+const hooks={};
+const dots=$('#dots');scenes.forEach((s,i)=>{const d=document.createElement('div');d.className='dot';d.onclick=()=>{if(i<=maxSeen||teacher)go(i)};dots.appendChild(d)});
+function chrome(){const s=scenes[cur];$('#hnum').textContent=cur+1;$('#htitle').textContent=s.dataset.title;
+  const tag=$('#htag');if(s.dataset.tag){tag.textContent=s.dataset.tag;tag.style.display='block'}else tag.style.display='none';
+  $$('.dot').forEach((d,i)=>{d.classList.toggle('on',i===cur);d.classList.toggle('seen',i<=maxSeen||teacher)});
+  $('#pageNo').textContent=`${cur+1} / ${N}`;
+  const lockedNow=gated(cur)&&!solved[cur]&&!teacher;
+  $('#next').classList.toggle('locked',lockedNow);$('#next').innerHTML=lockedNow?'🔒 다음':'다음 →';
+  $('#next').style.visibility=cur===N-1?'hidden':'visible';$('#prev').style.visibility=cur===0?'hidden':'visible';
+  $('#lockBtn').classList.toggle('show',lockedNow);$('#teacherBadge').style.display=teacher?'block':'none'}
+function go(i){if(i<0||i>=N||i===cur)return;
+  if(i>cur&&!teacher){for(let k=cur;k<i;k++)if(gated(k)&&!solved[k]){if(k===cur)blocked();else go(k);return}}
+  closePicker();const old=scenes[cur];hooks[old.dataset.id]?.leave?.();old.classList.remove('on');
+  cur=i;maxSeen=Math.max(maxSeen,i);scenes[cur].classList.add('on');hooks[scenes[cur].dataset.id]?.enter?.();chrome()}
+const next=()=>go(cur+1),prev=()=>go(cur-1);
+function solve(id){solved[idx(id)]=true;chrome()}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300)}
+function blocked(){toast('활동을 마치면 다음으로 넘어갈 수 있어요');const b=$('#lockBtn');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');SFX.no()}
+$('#next').onclick=next;$('#prev').onclick=prev;$('#startBtn').onclick=next;
+
+/* 교사용 비밀번호 */
+let pw='';const modal=$('#modal');
+const kp=$('#keypad');['1','2','3','4','5','6','7','8','9','지움','0','←'].forEach(k=>{const b=document.createElement('button');b.textContent=k;
+  b.onclick=()=>{if(k==='지움')pw='';else if(k==='←')pw=pw.slice(0,-1);else pwAdd(k);showPw()};kp.appendChild(b)});
+function pwAdd(k){if(pw.length<8)pw+=k;showPw()}
+function showPw(){$('#pwShow').textContent='●'.repeat(pw.length);$('#pwMsg').textContent=''}
+function openModal(){pw='';showPw();modal.classList.add('show')}
+function closeModal(){modal.classList.remove('show')}
+function submitPw(){if(pw===TEACHER_PASSWORD){teacher=true;closeModal();toast('교사 모드: 모든 단계를 자유롭게 넘길 수 있어요');chrome()}else{$('#pwMsg').textContent='비밀번호가 맞지 않아요';pw='';$('#pwShow').textContent='';SFX.no()}}
+$('#lockBtn').onclick=openModal;$('#pwCancel').onclick=closeModal;$('#pwOk').onclick=submitPw;
+
+/* 입력: 키보드 · 휠 */
+addEventListener('keydown',e=>{
+  if(modal.classList.contains('show')){e.preventDefault();if(e.key==='Escape')closeModal();else if(e.key==='Enter')submitPw();
+    else if(/^\d$/.test(e.key))pwAdd(e.key);else if(e.key==='Backspace'){pw=pw.slice(0,-1);showPw()}return}
+  if(e.key==='Escape'){closePicker();return}
+  if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}});
+let wheelLock=0;addEventListener('wheel',e=>{e.preventDefault();if(modal.classList.contains('show'))return;const n=Date.now();if(n<wheelLock||Math.abs(e.deltaY)<15)return;wheelLock=n+750;e.deltaY>0?next():prev()},{passive:false});
+document.addEventListener('click',e=>{SFX.get();if(e.target.closest('button'))setTimeout(()=>document.activeElement&&document.activeElement.blur&&document.activeElement.blur(),0)});
+
+/* 단일 선택 문제 도우미 */
+function singleQ(box,ans,hints,okMsg,onOk){const fb=box.querySelector('.fb');
+  $$('.opt',box).forEach(b=>b.addEventListener('click',()=>{if(box.dataset.done)return;
+    if(b.dataset.k===ans){$$('.opt',box).forEach(x=>x.classList.remove('wrong'));b.classList.add('correct');box.dataset.done=1;fb.className='fb ok';fb.innerHTML=okMsg;SFX.ok();onOk&&onOk()}
+    else{b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');fb.className='fb hint';fb.innerHTML=hints[b.dataset.k];SFX.no()}}))}
+
+/* ---------- 0 표지 ---------- */
+let coverTO;const simCover=new FoamSim($('#cvCover'),{sound:false,onDone:()=>{clearTimeout(coverTO);coverTO=setTimeout(()=>{if(scenes[cur].dataset.id==='cover')simCover.start()},3500)}});
+hooks.cover={enter(){clearTimeout(coverTO);coverTO=setTimeout(()=>simCover.start(),600)},leave(){clearTimeout(coverTO)}};
+
+/* ---------- 2 예측·관찰 ---------- */
+let pred2=null;
+const sim2=new FoamSim($('#cv2'),{temp:true,onDone:()=>{
+  $('#col2').classList.add('done');const w=$('#obsWrap2');w.style.display='flex';
+  $$('#obs2 li').forEach((li,i)=>setTimeout(()=>li.classList.add('show'),i*450));
+  const fb=$('#cmp2');setTimeout(()=>{fb.className='fb';fb.style.cssText='padding:12px 18px;background:rgba(90,200,250,.1);border-left:6px solid #5ac8fa;font-size:25px';
+    fb.innerHTML=pred2==='C'?`내 예측 <b>${pred2}</b>와 결과가 같아요! 왜 그럴까요? 하나씩 밝혀 봐요.`:`내 예측 <b>${pred2}</b>와 결과가 달라요. 무엇이 이런 변화를 일으켰는지 밝혀 봐요.`},1900);
+  $('#pour2').textContent='다시 붓기';$('#pour2').disabled=false;solve('observe')}});
+$$('#col2 .pred').forEach(b=>b.onclick=()=>{if($('#col2').classList.contains('done'))return;$$('#col2 .pred').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');pred2=b.dataset.k;$('#pour2').disabled=false});
+$('#pour2').onclick=()=>{if(!pred2)return;$('#pour2').disabled=true;sim2.start()};
+
+/* ---------- 3 화학 변화의 증거 ---------- */
+const evSel=new Set();
+$$('.ev').forEach(b=>b.onclick=()=>{if(solved[idx('evidence')])return;const k=b.dataset.k;evSel.has(k)?evSel.delete(k):evSel.add(k);b.classList.toggle('sel');b.classList.remove('wrong');$('#evCount').textContent=evSel.size+'개 선택'});
+$('#evCheck').onclick=()=>{if(solved[idx('evidence')])return;const fb=$('#evFb');let h=null;
+  if(evSel.has('d'))h='식용 색소가 퍼진 것은 물감을 물에 푼 것과 같아요. 색소의 성질이 바뀌었을까요?';
+  else if(evSel.has('e'))h='세제가 섞인 것은 물질이 섞이기만 한 거예요. 새로운 물질이 생겼을까요?';
+  else if(!evSel.has('a'))h='거품 속에는 처음에 없던 무언가가 들어 있었어요. 빠진 증거가 있어요.';
+  else if(!evSel.has('b'))h='실린더를 손등으로 대 보았을 때를 떠올려 보세요. 화학 변화에서는 열이나 빛이 나기도 해요.';
+  else if(!evSel.has('c'))h='아이오딘화 칼륨 용액은 무색인데, 반응 뒤 거품 색은 어땠나요?';
+  if(h){fb.className='fb hint';fb.innerHTML=h;SFX.no();$$('.ev.sel').forEach(b=>{b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong')})}
+  else{fb.className='fb ok';fb.innerHTML='기체 발생, 열 발생, 색 변화는 <b>새로운 물질</b>이 생겼다는 증거예요.';$$('.ev.sel').forEach(b=>{b.classList.remove('wrong');b.classList.add('correct')});
+    $('#evExplain').style.display='flex';SFX.ok();solve('evidence')}};
+
+/* ---------- 4 기체 확인 ---------- */
+(()=>{const g=$('#foamInc');for(let i=0;i<46;i++){mk('circle',{cx:rand(72,208),cy:rand(178,284),r:rand(9,16)},g)}})();
+const gasDone=new Set();
+$$('#scenes [data-t]').forEach(b=>b.onclick=async()=>{const t=b.dataset.t;b.disabled=true;const pnl=$('#tp'+t),svg=pnl.querySelector('svg');
+  svg.classList.remove('go','lit','big');void svg.offsetWidth;svg.classList.add('go');
+  if(t==='1'){await wait(1.25);svg.classList.add('lit');SFX.tone(520,.4,'sawtooth',.05)}
+  else if(t==='2'){await wait(2.2)}
+  else{await wait(1.05);svg.classList.add('big')}
+  pnl.classList.add('doneT');b.disabled=false;b.textContent='다시 해 보기';gasDone.add(t);
+  $('#gasCnt').textContent=`(${gasDone.size} / 3)`;if(gasDone.size===3)$('#qGas .opts').classList.remove('locked')});
+singleQ($('#qGas'),'o2',{
+  co2:'이산화 탄소라면 석회수가 뿌옇게 흐려져요. 결과는 어땠나요?',
+  h2:'수소라면 성냥불을 댈 때 \'퍽\' 소리가 나요. 소리가 났나요?',
+  vap:'김(수증기)도 조금 나오지만, 꺼져 가는 불씨를 다시 타오르게 하는 기체는 따로 있어요.'},
+  '<b>산소</b>는 스스로 타지는 않지만 다른 물질이 타는 것을 도와요. 그래서 불씨가 다시 타올라요.',()=>solve('gas'));
+
+/* ---------- 5 입자 모형 ---------- */
+const svg5=$('#svg5');
+mk('path',{d:'M392 250 H458 M444 236 L460 250 L444 264',stroke:'#7d8bb5','stroke-width':6,fill:'none','stroke-linecap':'round'},svg5);
+const lab5a=mk('text',{x:200,y:478,'text-anchor':'middle',fill:'#b3bedf','font-size':24,'font-weight':700},svg5);lab5a.textContent='반응 전';
+const lab5b=mk('text',{x:690,y:478,'text-anchor':'middle',fill:'#b3bedf','font-size':24,'font-weight':700,opacity:0},svg5);lab5b.textContent='반응 후';
+const pl5=[[610,120,'H₂O'],[610,348,'H₂O'],[780,195,'O₂']].map(([x,y,t])=>{const e=mk('text',{x,y:y+(t==='O₂'?0:-38),'text-anchor':'middle',fill:'#ffd25a','font-size':24,'font-weight':800,opacity:0},svg5);e.textContent=t;return e});
+const M5=new Mol(svg5);
+const ids5A=['a1','a2','a3','a4'],ids5B=['b1','b2','b3','b4'],T5={a1:'H',a2:'O',a3:'O',a4:'H',b1:'H',b2:'O',b3:'O',b4:'H'};
+const S5_0=Object.assign({},h2o2(200,140,ids5A),h2o2(200,360,ids5B));
+for(const id in S5_0)M5.add(id,T5[id],S5_0[id][0],S5_0[id][1]);
+const B5r=[['a1','a2'],['a2','a3'],['a3','a4'],['b1','b2'],['b2','b3'],['b3','b4']];
+const B5p=[['a2','a1'],['a2','a4'],['b3','b1'],['b3','b4'],['a3','b2']];
+M5.bonds(B5r);
+const S5_1=(()=>{const o={};for(const id in S5_0){const [x,y]=S5_0[id];const cy=id[0]==='a'?140:360;o[id]=[200+(x-200)*1.55+80,cy+(y-cy)*1.9]}return o})();
+const S5_2=Object.assign({},water(610,140,['a2','a1','a4']),water(610,348,['b3','b1','b4']),{a3:[752,232],b2:[808,232]});
+let st5=0,busy5=false;
+$('#b5a').onclick=async()=>{if(busy5||st5!==0)return;busy5=true;M5.bonds([]);SFX.tone(300,.15,'square',.05);await M5.to(S5_1,.8);st5=1;$('#pStage').textContent='결합이 끊어진 원자들';$('#b5a').disabled=true;$('#b5b').disabled=false;busy5=false};
+$('#b5b').onclick=async()=>{if(busy5||st5!==1)return;busy5=true;M5.bonds(B5p);await M5.to(S5_2,1.1);st5=2;SFX.tone(660,.2);
+  [lab5b,...pl5].forEach(e=>e.setAttribute('opacity',1));$('#pStage').textContent='물 분자 2개 + 산소 분자 1개';$('#b5b').disabled=true;
+  $('#q5').classList.remove('locked');$('#q5msg').textContent='';busy5=false};
+$('#b5c').onclick=async()=>{if(busy5)return;busy5=true;M5.bonds(B5r);[lab5b,...pl5].forEach(e=>e.setAttribute('opacity',0));await M5.to(S5_0,.8);st5=0;
+  $('#pStage').textContent='과산화 수소 분자 2개';$('#b5a').disabled=false;$('#b5b').disabled=true;busy5=false};
+/* 숫자 고르기 */
+const picker=$('#picker');let pickFor=null;
+function closePicker(){picker.style.display='none';pickFor=null}
+$$('.blank').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.classList.contains('ok'))return;if(pickFor===b){closePicker();return}
+  pickFor=b;picker.innerHTML='';b.dataset.opts.split(',').forEach(v=>{const x=document.createElement('button');x.textContent=v;
+    x.onclick=ev=>{ev.stopPropagation();b.textContent=v;b.classList.add('set');b.classList.remove('bad');closePicker()};picker.appendChild(x)});
+  const r=b.getBoundingClientRect(),s=stage.getBoundingClientRect();
+  picker.style.display='flex';picker.style.left=((r.left-s.left)/SCALE)+'px';picker.style.top=((r.bottom-s.top)/SCALE+8)+'px';
+  const pw=picker.offsetWidth,lx=parseFloat(picker.style.left);if(lx+pw>1580)picker.style.left=(1580-pw)+'px'});
+document.addEventListener('pointerdown',e=>{if(pickFor&&!picker.contains(e.target)&&!e.target.classList.contains('blank'))closePicker()});
+$('#chk5').onclick=()=>{if(solved[idx('particle')])return;const bl=$$('#q5 .blank');let bad=null;
+  bl.forEach(b=>{if(b.textContent!==b.dataset.ans){b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');if(!bad)bad=b}else b.classList.add('ok')});
+  const fb=$('#fb5');if(bad){fb.className='fb hint';fb.textContent=bad.textContent==='?'?'아직 비어 있는 칸이 있어요. '+bad.dataset.hint:bad.dataset.hint;SFX.no()}
+  else{fb.className='fb ok';fb.innerHTML='원자는 사라지거나 새로 생기지 않고 <b>배열만 바뀌어요.</b> (계수 1은 보통 생략해 <b>2H₂O₂ → 2H₂O + O₂</b>로 써요.)';SFX.ok();solve('particle')}};
+
+/* ---------- 6 KI 유무 비교 ---------- */
+const sim6a=new FoamSim($('#cv6a'),{ki:false,sound:false}),sim6b=new FoamSim($('#cv6b'),{ki:true});
+const g6=setupCanvas($('#cv6g'));let data6=[];
+function drawG6(){const c=g6.ctx,w=g6.w,h=g6.h,x0=70,y0=h-46,x1=w-24,y1=22;c.clearRect(0,0,w,h);
+  c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;for(let i=1;i<=4;i++){const y=y0-(y0-y1)*i/4;c.beginPath();c.moveTo(x0,y);c.lineTo(x1,y);c.stroke()}
+  c.strokeStyle='#7d8bb5';c.lineWidth=3;c.beginPath();c.moveTo(x0,y1-6);c.lineTo(x0,y0);c.lineTo(x1+6,y0);c.stroke();
+  c.fillStyle='#b3bedf';c.font=`700 22px ${FONT}`;c.textAlign='right';c.fillText('시간 →',x1,y0+34);
+  c.save();c.translate(x0-22,(y0+y1)/2);c.rotate(-Math.PI/2);c.textAlign='center';c.fillText('발생한 산소의 양 →',0,-8);c.restore();
+  c.textAlign='left';c.font=`600 18px ${FONT}`;c.fillStyle='#7d8bb5';c.fillText('모식 그래프 (실제 측정값 아님)',x0+14,y1+4);
+  const X=t=>x0+(t/9)*(x1-x0),Y=p=>y0-p*(y0-y1)*.92;
+  [['a','#8fa3d6','A (물)'],['b','#ff9f43','B (KI 용액)']].forEach(([k,col,nm],j)=>{c.strokeStyle=col;c.lineWidth=5;c.lineJoin='round';c.beginPath();
+    data6.forEach((d,i)=>{const x=X(d.t),y=Y(d[k]);i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke();
+    if(data6.length){const d=data6[data6.length-1];c.fillStyle=col;c.font=`800 22px ${FONT}`;c.textAlign='left';c.fillText(nm,Math.min(X(d.t)+10,x1-130),Y(d[k])+(k==='a'?-10:24))}})}
+drawG6();
+$('#run6').onclick=()=>{$('#run6').disabled=true;sim6a.start();sim6b.start();data6=[];let t=0;
+  tickers.add(dt=>{t+=dt;const rt=Math.max(0,t-.8);data6.push({t:rt,a:sim6a.p,b:sim6b.p});drawG6();
+    if(rt>=9){$('#run6').disabled=false;$('#run6').textContent='다시 붓기';$('#q6').classList.remove('locked');return false}})};
+singleQ($('#q6'),'fast',{
+  slow:'그래프에서 B가 A보다 산소가 빨리 늘었나요, 느리게 늘었나요?',
+  own:'KI를 이루는 원소는 칼륨(K)과 아이오딘(I)뿐이에요. 산소가 들어 있나요?',
+  film:'A에도 세제가 들어 있었지만 거품이 거의 생기지 않았어요. A와 B의 차이는 KI뿐이에요.'},
+  '과산화 수소는 그냥 두어도 <b>아주 천천히</b> 분해돼요(그래서 빛을 막는 갈색 병에 보관해요). KI가 이 분해를 <b>매우 빠르게</b> 해 줘요.',()=>solve('ki'));
+
+/* ---------- 7 촉매 ---------- */
+const svg7=$('#svg7');const M7=new Mol(svg7);
+const T7={I:'I',a1:'H',a2:'O',a3:'O',a4:'H',b1:'H',b2:'O',b3:'O',b4:'H'};
+const IP=[450,215];
+const S7_0=()=>Object.assign({I:[...IP,1]},h2o2(170,215,['a1','a2','a3','a4']),h2o2(740,110,['b1','b2','b3','b4'],.3));
+for(const [id,v] of Object.entries(S7_0()))M7.add(id,T7[id],v[0],v[1],v[2]);
+M7.bonds([['a1','a2'],['a2','a3'],['a3','a4'],['b1','b2'],['b2','b3'],['b3','b4']]);
+const iLab=mk('text',{x:IP[0],y:IP[1]+64,'text-anchor':'middle',fill:'#d6c2ff','font-size':26,'font-weight':800},svg7);iLab.textContent='I⁻';
+const pLab=[mk('text',{x:180,y:300,'text-anchor':'middle',fill:'#ffd25a','font-size':24,'font-weight':800,opacity:0},svg7),
+  mk('text',{x:720,y:300,'text-anchor':'middle',fill:'#ffd25a','font-size':24,'font-weight':800,opacity:0},svg7),
+  mk('text',{x:450,y:36,'text-anchor':'middle',fill:'#ffd25a','font-size':24,'font-weight':800,opacity:0},svg7)];
+pLab[0].textContent='H₂O';pLab[1].textContent='H₂O';pLab[2].textContent='O₂';
+let st7=0,busy7=false,o2n=0,cyc7=0;
+async function step7(){if(busy7)return;busy7=true;
+  if(st7===0){$('#m1').classList.add('on');$('#m2').classList.remove('on');
+    await M7.to(h2o2(300,215,['a1','a2','a3','a4']),.6);
+    M7.bonds([['a2','a1'],['a2','a4'],['I','a3'],['b1','b2'],['b2','b3'],['b3','b4']]);
+    await M7.to(Object.assign(water(180,330,['a2','a1','a4']),{a3:[IP[0]-66,IP[1]]}),.9);
+    iLab.textContent='IO⁻';pLab[0].setAttribute('opacity',1);st7=1;$('#b7s').textContent='2단계 진행'}
+  else if(st7===1){$('#m2').classList.add('on');$('#m1').classList.remove('on');
+    await M7.to(h2o2(640,215,['b1','b2','b3','b4']),.7);
+    M7.bonds([['a2','a1'],['a2','a4'],['a3','b2'],['b3','b1'],['b3','b4']]);
+    await M7.to(Object.assign(water(720,330,['b3','b1','b4']),{a3:[422,70],b2:[478,70]}),1);
+    iLab.textContent='I⁻';pLab[1].setAttribute('opacity',1);pLab[2].setAttribute('opacity',1);o2n++;cyc7++;$('#c7o').textContent=o2n;SFX.tone(700,.2);
+    st7=2;$('#b7s').textContent='새 분자로 다시';if(cyc7>=1)$('#q7').classList.remove('locked')}
+  else{pLab.forEach(e=>e.setAttribute('opacity',0));$('#m2').classList.remove('on');
+    await M7.to(fadeAll(),.4);
+    M7.set(Object.fromEntries(Object.entries(S7_0()).map(([k,v])=>[k,[v[0],v[1],0]])));M7.A.I.op=1;
+    M7.bonds([['a1','a2'],['a2','a3'],['a3','a4'],['b1','b2'],['b2','b3'],['b3','b4']]);
+    const s=S7_0();delete s.I;await M7.to(s,.5);st7=0;$('#b7s').textContent='1단계 진행'}
+  busy7=false}
+function fadeAll(){const o={};for(const id in M7.A)if(id!=='I'){const a=M7.A[id];o[id]=[a.x,a.y,0]}return o}
+$('#b7s').onclick=step7;
+$('#b7auto').onclick=async()=>{if(busy7)return;$('#b7auto').disabled=true;$('#b7s').disabled=true;
+  if(st7!==0)while(st7!==0)await step7();
+  for(let i=0;i<3;i++){await step7();await wait(.25);await step7();await wait(.5);await step7()}
+  $('#b7auto').disabled=false;$('#b7s').disabled=false};
+singleQ($('#q7'),'back',{
+  gone:'애니메이션의 I⁻ 개수를 보세요. 반응을 반복해도 줄어들었나요?',
+  o2:'O₂를 이루는 원자는 무슨 색이었나요? 보라색(I)이 들어갔나요?',
+  water:'물 분자(H₂O)에는 H와 O만 있어요. I⁻는 어디에 있었나요?'},
+  '이처럼 반응을 빠르게 하면서 <b>자신은 변하지 않는 물질</b>을 <b class="hp">촉매</b>라고 해요. 반응 중 아이오딘(I₂)이 조금 생겨 노란 갈색이 나타나요.',()=>solve('catalyst'));
+
+/* ---------- 8 역할 ---------- */
+const opt8={soap:true,ki:true,dye:true};
+const sim8=new FoamSim($('#cv8'),{onDone:s=>{const o=s.opt;let m;
+  if(o.ki&&o.soap)m='거품이 솟아 넘쳤다.';else if(o.ki)m='기포는 격렬히 생겼지만 거품이 쌓이지 않고 기체가 공기 중으로 빠져나갔다.';else m='눈에 띄는 변화가 거의 없었다.';
+  if(!o.dye)m+=' (색소 없음)';$('#res8').textContent=m;$('#run8').disabled=false}});
+$$('.tog').forEach(t=>t.onclick=()=>{const k=t.dataset.o;opt8[k]=!opt8[k];t.classList.toggle('on',opt8[k]);sim8.set(opt8);$('#res8').textContent='붓기를 눌러 실험해 보세요.';$('#run8').disabled=false});
+$('#run8').onclick=()=>{$('#run8').disabled=true;$('#res8').textContent='관찰 중…';sim8.start()};
+const hint8={h2o2:'반응식 2H₂O₂ → 2H₂O + O₂를 떠올려 보세요. 산소와 물은 어디에서 왔을까요?',
+  ki:'KI 용액을 빼고 실험해 보세요. 반응은 어떻게 되나요? 앞에서 I⁻가 어떻게 되었는지도 떠올려 보세요.',
+  soap:'세제를 빼고 실험해 보세요. 기체는 생기는데 무엇이 달라지나요?',
+  dye:'색소를 빼고 실험해 보세요. 반응이 똑같이 일어나나요?'};
+let placed8=0;
+$$('.dcard').forEach(card=>{let sx,sy,drag=false;
+  card.addEventListener('pointerdown',e=>{if(card.classList.contains('fixed'))return;drag=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.classList.remove('back');card.classList.add('drag')});
+  card.addEventListener('pointermove',e=>{if(!drag)return;card.style.transform=`translate(${(e.clientX-sx)/SCALE}px,${(e.clientY-sy)/SCALE}px)`;
+    const sl=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList&&x.classList.contains('slot'));$$('.slot').forEach(s=>s.classList.toggle('hover',s===sl))});
+  const end=e=>{if(!drag)return;drag=false;card.classList.remove('drag');$$('.slot').forEach(s=>s.classList.remove('hover'));
+    const sl=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList&&x.classList.contains('slot'));const fb=$('#fb8');
+    if(sl&&!sl.dataset.filled&&sl.dataset.acc===card.dataset.k){card.style.transform='';card.classList.add('fixed');sl.querySelector('.drop').appendChild(card);sl.dataset.filled=1;placed8++;SFX.ok();
+      if(placed8===4){fb.className='fb ok';fb.innerHTML='반응물은 <b>과산화 수소</b> 하나뿐! KI는 촉매, 세제는 거품을 만드는 도우미, 색소는 보기 좋게 하는 역할이에요.';solve('roles')}
+      else{fb.className='fb';fb.innerHTML=''}}
+    else{card.classList.add('back');card.style.transform='';if(sl){fb.className='fb hint';fb.textContent=hint8[card.dataset.k];SFX.no()}}};
+  card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)});
+
+/* ---------- 9 에너지 ---------- */
+const sim9=new FoamSim($('#cv9'),{temp:true,onDone:()=>{$('#run9').disabled=false;$('#run9').textContent='다시 해 보기';$('#q9').classList.remove('locked')}});
+$('#run9').onclick=()=>{$('#run9').disabled=true;sim9.start()};
+singleQ($('#q9'),'exo',{endo:'흡열 반응이라면 주변의 열을 빼앗아 실린더가 차가워져요. 온도계는 어떻게 변했나요?'},
+  '반응하면서 <b>에너지를 방출</b>해 주변 온도가 올라가는 <b>발열 반응</b>이에요. 손난로·연소도 발열 반응이에요.',()=>{$('#ediag').style.display='flex';solve('energy')});
+
+/* ---------- 10 질량 ---------- */
+function buildScale(svg,closed){svg.innerHTML='';
+  mk('rect',{x:50,y:300,width:340,height:16,rx:6,fill:'#c8d2ea'},svg);
+  mk('path',{d:'M70 316 H370 L392 388 H48 Z',fill:'#263768',stroke:'#4a5d99','stroke-width':2},svg);
+  mk('rect',{x:140,y:330,width:160,height:46,rx:8,fill:'#07140c',stroke:'#2e7d4a','stroke-width':2},svg);
+  const lcd=mk('text',{x:220,y:362,'text-anchor':'middle',fill:'#7dffa6','font-size':30,'font-weight':700,'font-family':'Consolas,Menlo,monospace'},svg);lcd.textContent='250.00 g';
+  const fg=mk('g',{},svg),o2=mk('g',{},svg);const foam=[];
+  if(!closed){mk('rect',{x:70,y:290,width:300,height:10,rx:4,fill:'rgba(255,255,255,.28)'},svg);
+    mk('rect',{x:193,y:236,width:50,height:52,fill:'#ff4f9a',opacity:.85},svg);
+    mk('path',{d:'M184 126 L190 132 V290 H246 V132 L252 126',fill:'none',stroke:'rgba(220,235,255,.75)','stroke-width':3},svg);
+    mk('path',{d:'M290 240 V288 H336 V240',fill:'rgba(220,240,255,.12)',stroke:'rgba(220,235,255,.75)','stroke-width':3},svg);
+    const kiLiq=mk('rect',{x:293,y:258,width:40,height:28,fill:'rgba(220,240,255,.45)'},svg);svg._ki=kiLiq;
+    for(let i=0;i<70;i++){let x,y;if(i<22){x=rand(196,240);y=rand(140,232)}else if(i<42){x=rand(180,256);y=rand(70,140)}else{const side=Math.random()<.5;x=side?rand(90,186):rand(250,360);y=rand(200,286)}
+      foam.push(mk('circle',{cx:x,cy:y,r:rand(8,14),fill:'#ffc9b0',stroke:'#e7a48e','stroke-width':1.5,opacity:0},fg))}
+    for(let i=0;i<5;i++){const t=mk('text',{x:150+i*36,y:110,fill:'#fff','font-size':24,'font-weight':800,class:'rise',style:`animation-delay:${i*.3}s`},o2);t.textContent='O₂'}}
+  else{mk('rect',{x:130,y:104,width:180,height:194,rx:30,fill:'rgba(190,215,255,.07)',stroke:'rgba(220,235,255,.85)','stroke-width':7},svg);
+    mk('rect',{x:190,y:82,width:60,height:30,rx:6,fill:'#8a94b8'},svg);
+    mk('path',{d:'M176 86 H264 M176 86 V118 M264 86 V118',stroke:'#c8d2ea','stroke-width':5,fill:'none'},svg);
+    mk('rect',{x:138,y:244,width:164,height:48,rx:20,fill:'#ff4f9a',opacity:.85},svg);
+    for(let i=0;i<60;i++)foam.push(mk('circle',{cx:rand(146,294),cy:rand(126,246),r:rand(8,13),fill:'#ffc9b0',stroke:'#e7a48e','stroke-width':1.5,opacity:0},fg));
+    for(let i=0;i<5;i++){const t=mk('text',{x:150+i*28,y:140+(i%2)*40,fill:'#fff','font-size':22,'font-weight':800,class:'wig',style:`animation-delay:${i*.1}s`},o2);t.textContent='O₂'}}
+  foam.sort((a,b)=>b.getAttribute('cy')-a.getAttribute('cy'));
+  return{lcd,foam,o2,svg}}
+let SA,SB,run10=false;
+function init10(){SA=buildScale($('#svgA'),false);SB=buildScale($('#svgB'),true);[SA,SB].forEach(s=>s.svg.classList.remove('running','fin'));run10=false;$('#run10').disabled=false}
+init10();
+$('#rst10').onclick=init10;
+$('#run10').onclick=async()=>{if(run10)return;run10=true;$('#run10').disabled=true;[SA,SB].forEach(s=>s.svg.classList.add('running'));
+  if(SA.svg._ki)SA.svg._ki.setAttribute('opacity',0);
+  await tween(4,k=>{const e=ease(k);SA.lcd.textContent=(250-1.6*e).toFixed(2)+' g';
+    [SA,SB].forEach(s=>s.foam.forEach((f,i)=>f.setAttribute('opacity',i/s.foam.length<k*1.3?1:0)))});
+  SA.svg.classList.remove('running');SB.svg.classList.remove('running');SB.svg.classList.add('fin');$('#q10').classList.remove('locked')};
+singleQ($('#q10'),'gas',{
+  atom:'B(닫힌 용기)에서는 질량이 그대로였어요. 원자가 사라진다면 B도 줄었겠죠?',
+  ki:'KI는 촉매라 반응 후에도 남아 있어요. 그리고 B에서는 질량이 그대로였어요.',
+  light:'거품도 물질이라 질량이 있어요. A에서만 무엇이 밖으로 나갔을까요?'},
+  '줄어든 <b>1.60 g</b>은 빠져나간 <b>산소의 질량</b>이에요. 산소까지 더하면 질량은 같아요.',()=>{$('#law10').style.display='block';solve('mass')});
+
+/* ---------- 11 정리 ---------- */
+$$('.scard').forEach(c=>c.onclick=()=>c.classList.toggle('open'));
+$('#openAll').onclick=()=>$$('.scard').forEach(c=>c.classList.add('open'));
+
+/* ---------- 12 확인 문제 ---------- */
+const QZ=[
+ {q:'거품 속 기체를 확인하는 방법과 그 결과로 옳은 것은?',o:[
+  ['꺼져 가는 불씨를 넣으면 다시 타오른다.',1],
+  ['석회수에 통과시키면 뿌옇게 흐려진다.','이것은 이산화 탄소를 확인하는 방법이에요.'],
+  ['성냥불을 가까이 하면 \'퍽\' 소리가 난다.','이것은 수소를 확인하는 방법이에요.'],
+  ['푸른색 염화 코발트 종이가 붉게 변한다.','이것은 물을 확인하는 방법이에요. 거품 속 기체는 불씨와 관련 있어요.']]},
+ {q:'2H₂O₂ → 2H₂O + O₂ 에 대한 설명으로 옳은 것은?',o:[
+  ['반응 전후 원자의 종류와 개수가 같다.',1],
+  ['반응 전 산소 원자는 2개, 반응 후는 4개이다.','H₂O₂ 분자 2개에 산소 원자가 몇 개 있는지 세어 보세요.'],
+  ['반응 후 수소 원자의 수가 줄어든다.','물 분자 2개 속 수소 원자를 세어 보세요.'],
+  ['반응 후 새로운 종류의 원자가 생긴다.','화학 반응에서는 원자의 배열만 바뀌어요.']]},
+ {q:'같은 실험에서 주방 세제만 빼면 어떻게 될까?',o:[
+  ['산소는 빠르게 생기지만 대부분 공기 중으로 빠져나가 거품이 거의 쌓이지 않는다.',1],
+  ['반응이 전혀 일어나지 않는다.','반응을 빠르게 하는 것은 KI예요. 세제는 무슨 일을 했나요?'],
+  ['거품이 더 많이 생긴다.','기체를 막으로 가두어 거품을 만드는 재료가 빠졌어요.'],
+  ['산소 대신 이산화 탄소가 생긴다.','반응물(과산화 수소)은 그대로예요. 탄소(C)가 어디서 올까요?']]},
+ {q:'아이오딘화 칼륨(KI)에 대한 설명으로 옳은 것은?',o:[
+  ['반응을 빠르게 하고, 반응 후에도 그대로 남는다.',1],
+  ['반응물로 쓰여 반응 후 모두 없어진다.','I⁻가 일하고 다시 돌아오던 장면을 떠올려 보세요.'],
+  ['분해되어 산소를 만든다.','KI에는 산소 원자가 없어요.'],
+  ['반응을 느리게 한다.','KI를 넣은 B가 훨씬 빨리 산소를 냈어요.']]},
+ {q:'반응 후 실린더가 따뜻해졌다. 이 반응에 대한 설명으로 옳은 것은?',o:[
+  ['에너지를 방출하는 발열 반응이다.',1],
+  ['에너지를 흡수하는 흡열 반응이다.','흡열 반응이면 주변이 차가워져요.'],
+  ['에너지의 출입이 없는 반응이다.','온도가 변했다는 것은 에너지가 출입했다는 뜻이에요.'],
+  ['새로운 물질이 생기지 않는 물리 변화이다.','산소라는 새로운 물질이 생겼어요.']]},
+ {q:'쟁반 위(열린 곳)에서 반응 전후 전체 질량을 쟀더니 줄었다. 옳은 설명은?',o:[
+  ['산소 기체가 빠져나갔기 때문이며, 빠져나간 산소까지 더하면 질량은 같다.',1],
+  ['이 반응에서는 질량 보존 법칙이 성립하지 않는다.','닫힌 용기에서는 질량이 그대로였어요.'],
+  ['열이 나서 물질이 가벼워졌다.','질량이 줄어든 만큼 무엇이 밖으로 나갔는지 생각해 보세요.'],
+  ['거품이 공기보다 가벼워 질량이 사라졌다.','거품도 질량이 있어요. 빠져나간 것은 무엇일까요?']]}
+];
+let qi=0,qDone=false;
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function renderQ(){const Q=QZ[qi];qDone=false;$('#qNo').textContent=`문제 ${qi+1} / ${QZ.length}`;
+  $('#qProg').innerHTML=QZ.map((_,i)=>`<i class="${i<qi?'done':i===qi?'cur':''}"></i>`).join('');
+  $('#qText').textContent=Q.q;const box=$('#qOpts');box.innerHTML='';$('#qFb').className='fb';$('#qFb').innerHTML='';$('#qNext').style.display='none';
+  shuffle(Q.o).forEach(([t,v],i)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=`<span class="ab">${'ABCD'[i]}</span>${t}`;
+    b.onclick=()=>{if(qDone)return;const fb=$('#qFb');
+      if(v===1){qDone=true;b.classList.add('correct');fb.className='fb ok';fb.innerHTML='잘했어요!';SFX.ok();$('#qNext').style.display='block';$('#qNext').textContent=qi===QZ.length-1?'결과 보기 →':'다음 문제 →'}
+      else{b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');fb.className='fb hint';fb.textContent=v;SFX.no()}};box.appendChild(b)})}
+$('#qNext').onclick=()=>{if(qi<QZ.length-1){qi++;renderQ()}else{$('#quizWrap').style.display='none';$('#quizEnd').style.display='flex';SFX.ok()}};
+$('#qRetry').onclick=()=>{qi=0;$('#quizEnd').style.display='none';$('#quizWrap').style.display='flex';renderQ()};
+renderQ();
+
+/* 시작 */
+scenes[0].classList.add('on');hooks.cover.enter();chrome();
+</script>
+</body>
+</html>
